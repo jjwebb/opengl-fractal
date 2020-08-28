@@ -24,6 +24,6 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
 {
     shader.Bind();
     va.Bind();
-    //ib.Bind(); //va does this already
+    ib.Bind(); //va does this already (does it????)
     GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
 }

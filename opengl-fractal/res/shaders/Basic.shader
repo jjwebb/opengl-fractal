@@ -18,7 +18,7 @@ void main()
 layout(location = 0) out vec4 color;
 
 in vec2 v_TexCoord;
-
+//this is a comment
 uniform vec4 u_Color;
 uniform sampler2D u_Texture;
 
