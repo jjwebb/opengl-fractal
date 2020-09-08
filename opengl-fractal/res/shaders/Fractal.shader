@@ -1,7 +1,7 @@
 #shader vertex
 #version 310 es
 
-precision mediump float;
+precision highp float;
 
 in vec4 position;
 //layout(location = 1) in vec2 texCoord;
@@ -19,7 +19,7 @@ void main()
 #shader fragment
 #version 310 es
 
-precision mediump float;
+precision highp float;
 #define ITER_MAX 200
 
 out vec4 color;
@@ -87,7 +87,7 @@ void main()
 		color = vec4(1.0f, 1.0f, 1.0f, 1.0f);*/
 	//else
 	float iterf = float(iter);
-		color = vec4(0.0f, 0.0f, 1.0f - iterf / (ITER_MAX.0f), 1.0f);
+		color = vec4(0.0f, 0.0f, 1.0f - iterf / float(ITER_MAX), 1.0f);
 	
 	
 };
