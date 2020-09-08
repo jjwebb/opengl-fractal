@@ -1,7 +1,10 @@
 #shader vertex
-#version 330 core
-layout(location = 0) in vec4 position;
-layout(location = 1) in vec2 texCoord;
+#version 310 es
+
+precision mediump float;
+
+in vec4 position;
+in vec2 texCoord;
 
 out vec2 v_TexCoord;
 
@@ -14,8 +17,11 @@ void main()
 };
 
 #shader fragment
-#version 330 core
-layout(location = 0) out vec4 color;
+#version 310 es
+
+precision mediump float;
+
+out vec4 color;
 
 in vec2 v_TexCoord;
 //this is a comment

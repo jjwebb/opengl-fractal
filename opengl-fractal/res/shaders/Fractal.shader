@@ -1,6 +1,9 @@
 #shader vertex
-#version 330 core
-layout(location = 0) in vec4 position;
+#version 310 es
+
+precision mediump float;
+
+in vec4 position;
 //layout(location = 1) in vec2 texCoord;
 
 //out vec2 v_TexCoord;
@@ -14,12 +17,12 @@ void main()
 };
 
 #shader fragment
-#version 330 core
+#version 310 es
 
-//precision highp float;
+precision mediump float;
 #define ITER_MAX 200
 
-layout(location = 0) out vec4 color;
+out vec4 color;
 
 //in vec2 v_TexCoord;
 //this is a comment
@@ -32,7 +35,7 @@ uniform float u_zoom;
 
 void main()
 {
-	if (gl_FragCoord.x == (u_FramebufferSize.x / 2) + 0.5f  && gl_FragCoord.y == (u_FramebufferSize.y / 2) + 0.5f)
+	if (gl_FragCoord.x == (u_FramebufferSize.x / 2.0f) + 0.5f  && gl_FragCoord.y == (u_FramebufferSize.y / 2.0f) + 0.5f)
 	{
 		color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		return;
@@ -68,13 +71,13 @@ void main()
 		//range of 4.8/3.0 = 1.6, same aspect ratio as window is locked to. 4.0/3.0 resulted in squished image 
 	//cy = cy0 - cy;
 	//cx = cx0 - cx;
-	float x, y, xtmp = 0.0f;
+	float x=0.0f; float y = 0.0f; float xtmp = 0.0f;
 	int iter;
 	for (iter = 0; iter < ITER_MAX; iter++)
 	{
 		xtmp = x * x - y * y + cx;
-		y = 2 * x * y + cy;
-		if (xtmp * xtmp + y * y > 4)
+		y = 2.0f * x * y + cy;
+		if (xtmp * xtmp + y * y > 4.0f)
 			break;
 		x = xtmp;
 	}
@@ -83,7 +86,8 @@ void main()
 	else if (iter == ITER_MAX - 1)
 		color = vec4(1.0f, 1.0f, 1.0f, 1.0f);*/
 	//else
-		color = vec4(0.0f, 0.0f, 1.0f - iter / (ITER_MAX*1.0f), 1.0f);
+	float iterf = float(iter);
+		color = vec4(0.0f, 0.0f, 1.0f - iterf / (ITER_MAX.0f), 1.0f);
 	
 	
 };

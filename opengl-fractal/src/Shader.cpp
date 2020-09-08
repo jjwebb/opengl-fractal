@@ -12,8 +12,10 @@
 Shader::Shader(const std::string& filepath)
 	: m_FilePath(filepath), m_RendererID(0)
 {
+    std::cout<<"Shader initializing.."<<std::endl;
     ShaderProgramSource source = ParseShader(filepath);
     m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
+    std::cout<<"Shader initialized"<<std::endl;
 }
 
 Shader::~Shader()
@@ -108,6 +110,7 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 {
     unsigned int id = glCreateShader(type);
     const char* src = source.c_str();
+    //std::cout << "Shader source code: " << src << std::endl;
     glShaderSource(id, 1, &src, nullptr);
     glCompileShader(id);
 
