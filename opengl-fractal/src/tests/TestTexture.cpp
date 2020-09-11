@@ -8,9 +8,9 @@ test::TestTexture::TestTexture()
     m_Shader("res/shaders/Basic.shader"),
     m_Renderer(),
     m_positions{
-        -50.0f, -50.0f, 0.0f, 0.0f, //0 second 2 floats for texture mapping
+       -50.0f, -50.0f, 0.0f, 0.0f, //0 second 2 floats for texture mapping
         50.0f, -50.0f, 1.0f, 0.0f, //1
-        50.0f, 50.0f, 1.0f, 1.0f, //2
+         50.0f, 50.0f, 1.0f, 1.0f, //2
         -50.0f, 50.0f, 0.0f, 1.0f //3
     },
     m_indices{

@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "Renderer.h"
 #include "VertexBufferLayout.h"
+#include "FrameBuffer.h"
 
 namespace test {
 	class TestFractal : public Test
@@ -26,6 +27,7 @@ namespace test {
 		VertexBuffer m_vb;
 		VertexBufferLayout m_layout;
 		IndexBuffer m_ib;
+		FrameBuffer m_fb;
 		//glm::vec3 m_translationA;
 		glm::vec3 m_scale;
 		glm::mat4 m_proj;

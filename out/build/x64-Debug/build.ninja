@@ -392,6 +392,15 @@ build Dependencies\GLFW\glfw\src\list_install_components: phony
 
 build cmake_object_order_depends_target_fractal_Debug: phony || cmake_object_order_depends_target_glfw_Debug
 
+build opengl-fractal\src\CMakeFiles\fractal.dir\FrameBuffer.cpp.obj: CXX_COMPILER__fractal_Debug ..\..\..\opengl-fractal\src\FrameBuffer.cpp || cmake_object_order_depends_target_fractal_Debug
+  DEFINES = -DGLEW_NO_GLU -DGLEW_STATIC
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   -std:c++17
+  INCLUDES = -I..\..\..\Dependencies\GLFW\glfw\include -I..\..\..\Dependencies\glew-2.1.0\include -I..\..\..\opengl-fractal\src\tests -I..\..\..\opengl-fractal\src -I..\..\..\opengl-fractal\src\vendor\glm -I..\..\..\opengl-fractal\src\vendor\glm\..
+  OBJECT_DIR = opengl-fractal\src\CMakeFiles\fractal.dir
+  OBJECT_FILE_DIR = opengl-fractal\src\CMakeFiles\fractal.dir
+  TARGET_COMPILE_PDB = opengl-fractal\src\CMakeFiles\fractal.dir\
+  TARGET_PDB = ..\..\..\opengl-fractal\fractal.pdb
+
 build opengl-fractal\src\CMakeFiles\fractal.dir\IndexBuffer.cpp.obj: CXX_COMPILER__fractal_Debug ..\..\..\opengl-fractal\src\IndexBuffer.cpp || cmake_object_order_depends_target_fractal_Debug
   DEFINES = -DGLEW_NO_GLU -DGLEW_STATIC
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   -std:c++17
@@ -580,7 +589,7 @@ build opengl-fractal\src\CMakeFiles\fractal.dir\vendor\stb_image\stb_image.cpp.o
 #############################################
 # Link the executable ..\..\..\opengl-fractal\fractal.exe
 
-build ..\..\..\opengl-fractal\fractal.exe: CXX_EXECUTABLE_LINKER__fractal_Debug opengl-fractal\src\CMakeFiles\fractal.dir\IndexBuffer.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\Renderer.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\Shader.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\Texture.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\VertexArray.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\VertexBuffer.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\VertexBufferLayout.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\main.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\tests\Test.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\tests\TestClearColor.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\tests\TestFractal.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\tests\TestTexture.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\glm\detail\glm.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\imgui\imgui.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\imgui\imgui_demo.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\imgui\imgui_draw.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\imgui\imgui_impl_glfw.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\imgui\imgui_impl_opengl3.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\imgui\imgui_widgets.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\stb_image\stb_image.cpp.obj | Dependencies\GLFW\glfw\src\glfw3.lib || Dependencies\GLFW\glfw\src\glfw3.lib
+build ..\..\..\opengl-fractal\fractal.exe: CXX_EXECUTABLE_LINKER__fractal_Debug opengl-fractal\src\CMakeFiles\fractal.dir\FrameBuffer.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\IndexBuffer.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\Renderer.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\Shader.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\Texture.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\VertexArray.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\VertexBuffer.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\VertexBufferLayout.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\main.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\tests\Test.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\tests\TestClearColor.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\tests\TestFractal.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\tests\TestTexture.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\glm\detail\glm.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\imgui\imgui.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\imgui\imgui_demo.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\imgui\imgui_draw.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\imgui\imgui_impl_glfw.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\imgui\imgui_impl_opengl3.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\imgui\imgui_widgets.cpp.obj opengl-fractal\src\CMakeFiles\fractal.dir\vendor\stb_image\stb_image.cpp.obj | Dependencies\GLFW\glfw\src\glfw3.lib || Dependencies\GLFW\glfw\src\glfw3.lib
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = opengl32.lib  glew32s.lib  Dependencies\GLFW\glfw\src\glfw3.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib

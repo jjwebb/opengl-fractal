@@ -12,19 +12,20 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_Shader("res/shaders/Fractal.shader"),
     m_Renderer(),
     m_positions{
-        0.0f, 0.0f, 
-        1440.0f, 0.0f, 
-        1440.0f, 900.0f, 
-        0.0f, 900.0f, 
+        0.0f, 0.0f, 0.0f, 0.0f,
+        1440.0f, 0.0f, 1.0f, 0.0f,
+        1440.0f, 900.0f, 1.0f, 1.0f,
+        0.0f, 900.0f, 0.0f, 1.0f
     },
     m_indices{
         0, 1, 2,
         0, 2, 3
     },
     m_va(),
-    m_vb(m_positions, 2 * 4 * sizeof(float)),
+    m_vb(m_positions, 4 * 4 * sizeof(float)),
     m_layout(),
     m_ib(m_indices, 6),
+    m_fb(window),
     //m_translationA(200, 200, 0),
     m_scale(1.0f, 1.0f, 1.0f),
     m_proj(glm::ortho(0.0f, 1440.0f, 0.0f, 900.0f, -1.0f, 1.0f)),
@@ -34,6 +35,7 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_zoom(1.0f)
     //m_view(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
 {
+    m_layout.Push<float>(2);
     m_layout.Push<float>(2);
     //m_layout.Push<float>(2);
 
@@ -66,6 +68,15 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_Shader.SetUniformMat4f("u_MVP", m_proj);
     m_Shader.SetUniform2f("u_offset", m_offset.x, m_offset.y);
     m_Shader.SetUniform1f("u_zoom", m_zoom);
+    m_Shader.SetUniform1i("u_Texture", 0);
+
+    OnUpdate(0.0f);
+    m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
+    m_fb.renderToTexture();                        //rendering the same image over and over
+    OnRender();
+    m_Shader.SetUniform1i("u_renderToTexture", 0);
+    m_fb.renderToScreen();
+    OnRender();
 }
 
 test::TestFractal::~TestFractal()
@@ -203,46 +214,13 @@ void test::TestFractal::cursor_position_callback(GLFWwindow* window, double xpos
 
 void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {    
-    void* data = glfwGetWindowUserPointer(window);
-    TestFractal* obj = static_cast<TestFractal*>(data);
-
-    int x, y;
-    glfwGetFramebufferSize(window, &x, &y);
-
-    double xp, yp;
-    glfwGetCursorPos(window, &xp, &yp);
-
-    
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    if (action == GLFW_PRESS)
     {
-        //obj->m_offset.x += (-x / 2.0f + (float)xp);
-        //obj->m_offset.y += ( y / 2.0f - (float)yp);
+        void* data = glfwGetWindowUserPointer(window);
+        TestFractal* obj = static_cast<TestFractal*>(data);
 
-        float cx = (((((obj->m_crosshair.x) / x)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-        float cy = (((((obj->m_crosshair.y) / y)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoom + obj->m_offset.y;
-        
-        obj->m_offset.x = cx;
-        obj->m_offset.y = cy;
-
-        obj->m_zoom /= 2.0f;
-
-        //float x1 = (obj->m_crosshair.x + obj->m_offset.x) / (obj->m_zoom * obj->m_zoom) + (3.0f * x * obj->m_zoom * obj->m_zoom - 3.0f * x) / (4.8f * obj->m_zoom * obj->m_zoom) - obj->m_crosshair.x;
-        //float y1 = (obj->m_crosshair.y + obj->m_offset.y) / (obj->m_zoom * obj->m_zoom) + (1.5f * y * obj->m_zoom * obj->m_zoom - 1.5f * y) / (3.0f * obj->m_zoom * obj->m_zoom) - obj->m_crosshair.y;
-        //obj->m_offset.x += x1;
-        //obj->m_offset.y += y1;
-        //obj->m_offset.x = (-4.8f * obj->m_crosshair.x + 3.0f * (float)xp) / (4.8f * obj->m_offset.x);
-
-        //obj->m_offset.x *= obj->m_zoom;
-        //obj->m_offset.y *= obj->m_zoom;
-        obj->m_Shader.SetUniform2f("u_offset", obj->m_offset.x, obj->m_offset.y);
-        obj->m_Shader.SetUniform1f("u_zoom", obj->m_zoom);
-
-    }
-    else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-    {
-        //if(obj->m)
-        //obj->m_offset.x += (-x / 2.0f + (float)xp) / obj->m_zoom;
-        //obj->m_offset.y += ( y / 2.0f - (float)yp) / obj->m_zoom;
+        int x, y;
+        glfwGetFramebufferSize(window, &x, &y);
 
         float cx = (((((obj->m_crosshair.x) / x)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
         float cy = (((((obj->m_crosshair.y) / y)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoom + obj->m_offset.y;
@@ -250,18 +228,19 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
         obj->m_offset.x = cx;
         obj->m_offset.y = cy;
 
-        obj->m_zoom *= 2.0f;
-        //float x1 = (obj->m_crosshair.x + obj->m_offset.x) / (obj->m_zoom * obj->m_zoom) + (3.0f * x * obj->m_zoom * obj->m_zoom - 3.0f * x) / (4.8f * obj->m_zoom * obj->m_zoom) - obj->m_crosshair.x;
-        //float y1 = (obj->m_crosshair.y + obj->m_offset.y) / (obj->m_zoom * obj->m_zoom) + (1.5f * y * obj->m_zoom * obj->m_zoom - 1.5f * y) / (3.0f * obj->m_zoom * obj->m_zoom) - obj->m_crosshair.y;
-        //obj->m_offset.x += x1;
-        //obj->m_offset.y += y1;
-        //obj->m_offset.x = (-4.8f * obj->m_crosshair.x + 3.0f * (float)xp) / (4.8f * obj->m_offset.x);
+        if (button == GLFW_MOUSE_BUTTON_LEFT)
+            obj->m_zoom /= 2.0f;
+        else if (button == GLFW_MOUSE_BUTTON_RIGHT)
+            obj->m_zoom *= 2.0f;
 
-        //obj->m_offset.x /= obj->m_zoom;
-        //obj->m_offset.y /= obj->m_zoom;
         obj->m_Shader.SetUniform2f("u_offset", obj->m_offset.x, obj->m_offset.y);
         obj->m_Shader.SetUniform1f("u_zoom", obj->m_zoom);
-    }
 
+        obj->m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
+        obj->m_fb.renderToTexture();                        //rendering the same image over and over
+        obj->OnRender();
+        obj->m_Shader.SetUniform1i("u_renderToTexture", 0);
+        obj->m_fb.renderToScreen();
+    }
 }
 
