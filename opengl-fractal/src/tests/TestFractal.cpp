@@ -30,9 +30,14 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_scale(1.0f, 1.0f, 1.0f),
     m_proj(glm::ortho(0.0f, 1440.0f, 0.0f, 900.0f, -1.0f, 1.0f)),
     m_crosshair(720.5f, 450.5f),
+    m_crosshairMandel(0.0f, 0.0f),
     //m_offset(0.598333f, -0.001667f),
     m_offset(0.0f, 0.0f),
-    m_zoom(1.0f)
+    m_offsetMandel(0.0f, 0.0f),
+    m_zoom(1.0f),
+    m_zoomMandel(0.0f),
+    m_Exp(2.0f),
+    m_renderJulia(false)
     //m_view(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
 {
     m_layout.Push<float>(2);
@@ -64,11 +69,14 @@ test::TestFractal::TestFractal(GLFWwindow* window)
 
     glfwSetWindowUserPointer(m_window, this);
     glfwSetMouseButtonCallback(m_window, mouse_button_callback);
+    glfwSetKeyCallback(m_window, key_callback);
 
     m_Shader.SetUniformMat4f("u_MVP", m_proj);
     m_Shader.SetUniform2f("u_offset", m_offset.x, m_offset.y);
     m_Shader.SetUniform1f("u_zoom", m_zoom);
+    m_Shader.SetUniform1f("u_Exp", m_Exp);
     m_Shader.SetUniform1i("u_Texture", 0);
+    m_Shader.SetUniform1i("u_julia", m_renderJulia);
 
     OnUpdate(0.0f);
     m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
@@ -83,6 +91,7 @@ test::TestFractal::~TestFractal()
 {
     glfwSetWindowUserPointer(m_window, NULL);
     glfwSetMouseButtonCallback(m_window, NULL);
+    glfwSetKeyCallback(m_window, NULL);
 }
 
 void test::TestFractal::OnUpdate(float deltaTime)
@@ -103,8 +112,8 @@ void test::TestFractal::OnUpdate(float deltaTime)
 
     double xp, yp;
     glfwGetCursorPos(m_window, &xp, &yp);
-    m_crosshair.x = (float)xp + 0.5f; 
-    m_crosshair.y = y - ((float)yp + 0.5f);
+    //m_crosshair.x = (float)xp + 0.5f; 
+    //m_crosshair.y = y - ((float)yp + 0.5f);
     m_Shader.SetUniform2f("u_crossHairCoord", m_crosshair.x, m_crosshair.y);
 }
 
@@ -140,9 +149,9 @@ void test::TestFractal::OnImGuiRender()
     float cx = (((((m_crosshair.x) / x)) * 4.8f - 3.0f) + 0.598333f) *  m_zoom + m_offset.x; //translate screen coords to -3 to 1.8, 4.8
     float cy = (((((m_crosshair.y) / y)) * 3.0f - 1.5f) + 0.001667f) * m_zoom + m_offset.y;
 
-    float mz = m_zoom / 2;
-    float x1 = (m_crosshair.x + m_offset.x) / (mz * mz) + (3.0f * x * mz * mz - 3.0f * x) / (4.8f * mz * mz) - m_crosshair.x;
-    float y1 = (m_crosshair.y + m_offset.y) / (mz * mz) + (1.5f * y * mz * mz - 1.5f * y) / (3.0f * mz * mz) - m_crosshair.y;
+    //float mz = m_zoom / 2;
+    //float x1 = (m_crosshair.x + m_offset.x) / (mz * mz) + (3.0f * x * mz * mz - 3.0f * x) / (4.8f * mz * mz) - m_crosshair.x;
+    //float y1 = (m_crosshair.y + m_offset.y) / (mz * mz) + (1.5f * y * mz * mz - 1.5f * y) / (3.0f * mz * mz) - m_crosshair.y;
 
     double xp, yp;
     glfwGetCursorPos(m_window, &xp, &yp);
@@ -157,8 +166,9 @@ void test::TestFractal::OnImGuiRender()
     ImGui::Text("X offset: %f Y offset: %f", m_offset.x, m_offset.y);
     //ImGui::SliderFloat2("Offset: ", &m_offset.x, -2000.0f, 2000.0f);
     ImGui::Text("X offset add: %f Y offset add: %f", ox, oy);
+    ImGui::Text("Crosshair: X: %f Y: %f", m_crosshair.x, m_crosshair.y);
     //ImGui::Text("X1: %f Y1: %f", x1, y1);
-    ImGui::Text("Zoom: %lf / %lf", m_zoom, 1/m_zoom);
+    //ImGui::Text("Zoom: %lf / %lf", m_zoom, 1/m_zoom);
     ImGui::Text("Zoom: %f / %f", m_zoom, 1 / m_zoom);
     if (ImGui::Button("Reset"))
     {
@@ -214,7 +224,7 @@ void test::TestFractal::cursor_position_callback(GLFWwindow* window, double xpos
 
 void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {    
-    if (action == GLFW_PRESS)
+    if (action == GLFW_PRESS && mods != GLFW_MOD_SHIFT)
     {
         void* data = glfwGetWindowUserPointer(window);
         TestFractal* obj = static_cast<TestFractal*>(data);
@@ -225,13 +235,24 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
         float cx = (((((obj->m_crosshair.x) / x)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
         float cy = (((((obj->m_crosshair.y) / y)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoom + obj->m_offset.y;
 
-        obj->m_offset.x = cx;
-        obj->m_offset.y = cy;
+        if (!obj->m_renderJulia || mods == 0)
+        {
+            obj->m_offset.x = cx;
+            obj->m_offset.y = cy;
+        }
 
         if (button == GLFW_MOUSE_BUTTON_LEFT)
+        {
             obj->m_zoom /= 2.0f;
+            obj->m_crosshair.x = x / 2 + 0.5f;
+            obj->m_crosshair.y = y / 2 + 0.5f;
+        }
         else if (button == GLFW_MOUSE_BUTTON_RIGHT)
+        {
             obj->m_zoom *= 2.0f;
+            obj->m_crosshair.x = x / 2 + 0.5f;
+            obj->m_crosshair.y = y / 2 + 0.5f;
+        }
 
         obj->m_Shader.SetUniform2f("u_offset", obj->m_offset.x, obj->m_offset.y);
         obj->m_Shader.SetUniform1f("u_zoom", obj->m_zoom);
@@ -244,3 +265,207 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
     }
 }
 
+void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (action == GLFW_PRESS || action == GLFW_REPEAT)
+    {
+        void* data = glfwGetWindowUserPointer(window);
+        TestFractal* obj = static_cast<TestFractal*>(data);
+
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+
+        switch(key)
+        { 
+        case GLFW_KEY_W:
+        case GLFW_KEY_UP:
+
+            if (key == GLFW_KEY_W && obj->m_renderJulia)
+            {
+                if (obj->m_crosshair.y == obj->m_crosshairMandel.y && obj->m_crosshair.x == obj->m_crosshairMandel.x)
+                    obj->m_crosshair.y += 20;
+                else
+                {
+                    obj->m_crosshair.y = obj->m_crosshairMandel.y +20;
+                    obj->m_crosshair.x = obj->m_crosshairMandel.x;
+                }
+                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
+                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
+                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
+                //obj->m_offsetMandel.x = obj->m_offset.x;
+                //obj->m_offsetMandel.y = obj->m_offset.y;
+                obj->m_crosshairMandel.x = obj->m_crosshair.x;
+                obj->m_crosshairMandel.y = obj->m_crosshair.y;
+            }
+            else 
+                obj->m_crosshair.y += 20;
+            if (obj->m_crosshair.y > height)
+            {
+                obj->m_crosshair.y += height / 4;
+                float tmp = obj->m_crosshair.x;
+                obj->m_crosshair.x = width / 2 + 0.5f;
+                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
+                //obj->m_crosshair.y = 2.5f;
+                obj->m_crosshair.y = height / 4 + 0.5f;
+                obj->m_crosshair.x = tmp;
+            }
+            break;
+        case GLFW_KEY_S:
+        case GLFW_KEY_DOWN:
+            if (key == GLFW_KEY_S && obj->m_renderJulia)
+            {
+                if (obj->m_crosshair.y == obj->m_crosshairMandel.y && obj->m_crosshair.x == obj->m_crosshairMandel.x)
+                    obj->m_crosshair.y -= 20;
+                else
+                {
+                    obj->m_crosshair.y = obj->m_crosshairMandel.y - 20;
+                    obj->m_crosshair.x = obj->m_crosshairMandel.x;
+                }
+                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
+                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
+                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
+                //obj->m_offsetMandel.x = obj->m_offset.x;
+                //obj->m_offsetMandel.y = obj->m_offset.y;
+                obj->m_crosshairMandel.x = obj->m_crosshair.x;
+                obj->m_crosshairMandel.y = obj->m_crosshair.y;
+            }
+            else 
+                obj->m_crosshair.y -= 20;
+            if (obj->m_crosshair.y < 0)
+            {
+                obj->m_crosshair.y -= height / 4;
+                float tmp = obj->m_crosshair.x;
+                obj->m_crosshair.x = width / 2 + 0.5f;
+                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
+                //obj->m_crosshair.y = height - 2.5f;
+                obj->m_crosshair.y = height - (height / 4) - 0.5f;
+                obj->m_crosshair.x = tmp;
+            }
+            break;
+        case GLFW_KEY_A:
+        case GLFW_KEY_LEFT:
+            if (key == GLFW_KEY_A && obj->m_renderJulia)
+            {
+                if (obj->m_crosshair.y == obj->m_crosshairMandel.y && obj->m_crosshair.x == obj->m_crosshairMandel.x)
+                    obj->m_crosshair.x -= 20;
+                else
+                {
+                    obj->m_crosshair.y = obj->m_crosshairMandel.y;
+                    obj->m_crosshair.x = obj->m_crosshairMandel.x - 20;
+                }
+                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
+                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
+                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
+                //obj->m_offsetMandel.x = obj->m_offset.x;
+                //obj->m_offsetMandel.y = obj->m_offset.y;
+                obj->m_crosshairMandel.x = obj->m_crosshair.x;
+                obj->m_crosshairMandel.y = obj->m_crosshair.y;
+            }
+            else
+                obj->m_crosshair.x -= 20;
+            if (obj->m_crosshair.x < 0)
+            {
+                obj->m_crosshair.x -= width / 4;
+                float tmp = obj->m_crosshair.y;
+                obj->m_crosshair.y = height / 2 + 0.5f;
+                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
+                obj->m_crosshair.x = width - (width / 4) - 0.5f;
+                obj->m_crosshair.y = tmp;
+            }
+            break;
+        case GLFW_KEY_D:
+        case GLFW_KEY_RIGHT:
+            if (key == GLFW_KEY_D && obj->m_renderJulia)
+            {
+                if (obj->m_crosshair.y == obj->m_crosshairMandel.y && obj->m_crosshair.x == obj->m_crosshairMandel.x)
+                    obj->m_crosshair.x += 20;
+                else
+                {
+                    obj->m_crosshair.y = obj->m_crosshairMandel.y;
+                    obj->m_crosshair.x = obj->m_crosshairMandel.x + 20;
+                }
+                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
+                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
+
+                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
+                //obj->m_offsetMandel.x = obj->m_offset.x;
+                //obj->m_offsetMandel.y = obj->m_offset.y;
+                obj->m_crosshairMandel.x = obj->m_crosshair.x;
+                obj->m_crosshairMandel.y = obj->m_crosshair.y;
+            }
+            else
+                obj->m_crosshair.x += 20;
+            if (obj->m_crosshair.x > width)
+            {
+                obj->m_crosshair.x += width / 4;
+                float tmp = obj->m_crosshair.y;
+                obj->m_crosshair.y = height / 2 + 0.5f;
+                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
+                obj->m_crosshair.x = width / 4 + 0.5f;
+                obj->m_crosshair.y = tmp;
+            }
+            break;
+        case GLFW_KEY_BACKSPACE:
+            mouse_button_callback(window, GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS, 0);
+            break;
+        case GLFW_KEY_ENTER:
+            mouse_button_callback(window, GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS, 0);
+            break;
+        case GLFW_KEY_J:
+        {
+            if (!obj->m_renderJulia)
+            {
+                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
+                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoom + obj->m_offset.y;
+                obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
+                
+                obj->m_offsetMandel.x = obj->m_offset.x;
+                obj->m_offsetMandel.y = obj->m_offset.y;
+                obj->m_crosshairMandel.x = obj->m_crosshair.x;
+                obj->m_crosshairMandel.y = obj->m_crosshair.y;
+                obj->m_offset.x = cx;
+                obj->m_offset.y = cy;
+                obj->m_zoomMandel = obj->m_zoom;
+
+            }
+            else
+            {
+                obj->m_offset.x = obj->m_offsetMandel.x;
+                obj->m_offset.y = obj->m_offsetMandel.y;
+                obj->m_crosshair.x = obj->m_crosshairMandel.x;
+                obj->m_crosshair.y = obj->m_crosshairMandel.y;
+                obj->m_zoom = obj->m_zoomMandel;
+            }
+            obj->m_Shader.SetUniform1i("u_julia", !obj->m_renderJulia);
+            obj->m_renderJulia = !obj->m_renderJulia;
+            mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
+            obj->m_crosshair.x = width / 2 + 0.5f;
+            obj->m_crosshair.y = height / 2 + 0.5f;
+            break;
+        }
+        case GLFW_KEY_N:
+            obj->m_Shader.SetUniform1f("u_Exp", obj->m_Exp + 1.0f);
+            obj->m_Exp++;
+            mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
+            obj->m_crosshair.x = width / 2 + 0.5f;
+            obj->m_crosshair.y = height / 2 + 0.5f;
+            break;
+        case GLFW_KEY_P:
+            if (obj->m_Exp > 2.0f)
+            {
+                obj->m_Exp--;
+                obj->m_Shader.SetUniform1f("u_Exp", obj->m_Exp);
+                //obj->m_Exp--;
+                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
+                obj->m_crosshair.x = width / 2 + 0.5f;
+                obj->m_crosshair.y = height / 2 + 0.5f;
+            }
+            break;
+
+        }
+    }
+}

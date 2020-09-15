@@ -32,11 +32,17 @@ namespace test {
 		glm::vec3 m_scale;
 		glm::mat4 m_proj;
 		glm::vec2 m_crosshair;
+		glm::vec2 m_crosshairMandel;
 		glm::vec2 m_offset;
+		glm::vec2 m_offsetMandel;
 		float m_zoom;
+		float m_zoomMandel;
+		float m_Exp;
+		bool m_renderJulia;
 		//void fractalWindow();
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+		static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 		//glm::mat4 m_view;
 	};
 }
