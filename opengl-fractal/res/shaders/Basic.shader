@@ -32,5 +32,11 @@ void main()
 {
 	//vec4 texColor = texture(u_Texture, v_TexCoord);
    //color = texColor;
-	color = texture(u_Texture, v_TexCoord);
+   float x=0.0f;
+   for (int i = 0; i < 1000; i++)
+   {
+      x = pow(x, 2.0f);
+   }
+	//color = texture(u_Texture, v_TexCoord);
+  color = vec4(0.0f, x / 255.0f, 0.0f, 1.0f);
 };
