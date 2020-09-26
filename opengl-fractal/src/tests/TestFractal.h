@@ -1,6 +1,6 @@
 #pragma once
 
-#include <time.h>
+#include<chrono>
 #include "Test.h"
 #include "Texture.h"
 #include "Renderer.h"
@@ -40,6 +40,7 @@ namespace test {
 		float m_zoomMandel;
 		float m_Exp;
 		bool m_renderJulia;
+		long long m_renderTime;
 		//void fractalWindow();
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
