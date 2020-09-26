@@ -37,7 +37,8 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_zoom(1.0f),
     m_zoomMandel(0.0f),
     m_Exp(2.0f),
-    m_renderJulia(false)
+    m_renderJulia(false),
+    m_renderTime(0)
     //m_view(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
 {
     m_layout.Push<float>(2);
@@ -146,8 +147,10 @@ void test::TestFractal::OnImGuiRender()
     int x, y;
     glfwGetFramebufferSize(m_window, &x, &y);
     
-    float cx = (((((m_crosshair.x) / x)) * 4.8f - 3.0f) + 0.598333f) *  m_zoom + m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-    float cy = (((((m_crosshair.y) / y)) * 3.0f - 1.5f) + 0.001667f) * m_zoom + m_offset.y;
+    float cx = (((((m_crosshair.x) / x)) * 4.8f - 3.0f) + 0.598333f) 
+        *  m_zoom + m_offset.x; //translate screen coords to -3 to 1.8, 4.8
+    float cy = (((((m_crosshair.y) / y)) * 3.0f - 1.5f) + 0.001667f) 
+        * m_zoom + m_offset.y;
 
     //float mz = m_zoom / 2;
     //float x1 = (m_crosshair.x + m_offset.x) / (mz * mz) + (3.0f * x * mz * mz - 3.0f * x) / (4.8f * mz * mz) - m_crosshair.x;
@@ -170,6 +173,7 @@ void test::TestFractal::OnImGuiRender()
     //ImGui::Text("X1: %f Y1: %f", x1, y1);
     //ImGui::Text("Zoom: %lf / %lf", m_zoom, 1/m_zoom);
     ImGui::Text("Zoom: %f / %f", m_zoom, 1 / m_zoom);
+    ImGui::Text("Render time: %lld", m_renderTime);
     if (ImGui::Button("Reset"))
     {
         m_offset.x = 0.0f;
@@ -232,8 +236,10 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
         int x, y;
         glfwGetFramebufferSize(window, &x, &y);
 
-        float cx = (((((obj->m_crosshair.x) / x)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-        float cy = (((((obj->m_crosshair.y) / y)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoom + obj->m_offset.y;
+        float cx = (((((obj->m_crosshair.x) / x)) * 4.8f - 3.0f) + 0.598333f) 
+            * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
+        float cy = (((((obj->m_crosshair.y) / y)) * 3.0f - 1.5f) + 0.001667f) 
+            * obj->m_zoom + obj->m_offset.y;
 
         if (!obj->m_renderJulia || mods == 0)
         {
@@ -257,9 +263,12 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
         obj->m_Shader.SetUniform2f("u_offset", obj->m_offset.x, obj->m_offset.y);
         obj->m_Shader.SetUniform1f("u_zoom", obj->m_zoom);
 
+        auto start = std::chrono::high_resolution_clock::now();
         obj->m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
         obj->m_fb.renderToTexture();                        //rendering the same image over and over
         obj->OnRender();
+        auto elapsed = std::chrono::high_resolution_clock::now() - start;
+        obj->m_renderTime = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
         obj->m_Shader.SetUniform1i("u_renderToTexture", 0);
         obj->m_fb.renderToScreen();
     }
@@ -277,11 +286,15 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
 
         switch(key)
         { 
+        //WASD move the crosshair AND the value of C (changing the julia set displayed when in julia mode),
+        //effectively moving the crosshair as if the Mandelbrot set were still displayed.
+        //UP DOWN LEFT RIGHT move ONLY the crosshair (leaving the julia set unchanged)
         case GLFW_KEY_W:
         case GLFW_KEY_UP:
 
             if (key == GLFW_KEY_W && obj->m_renderJulia)
             {
+                //The crosshair could have moved with the arrow keys, we need to reset it if the last move wasn't with WASD
                 if (obj->m_crosshair.y == obj->m_crosshairMandel.y && obj->m_crosshair.x == obj->m_crosshairMandel.x)
                     obj->m_crosshair.y += 20;
                 else
@@ -289,8 +302,10 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                     obj->m_crosshair.y = obj->m_crosshairMandel.y +20;
                     obj->m_crosshair.x = obj->m_crosshairMandel.x;
                 }
-                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) 
+                    * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
+                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) 
+                    * obj->m_zoomMandel + obj->m_offsetMandel.y;
                 obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
                 mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
                 //obj->m_offsetMandel.x = obj->m_offset.x;
@@ -298,17 +313,19 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                 obj->m_crosshairMandel.x = obj->m_crosshair.x;
                 obj->m_crosshairMandel.y = obj->m_crosshair.y;
             }
-            else 
-                obj->m_crosshair.y += 20;
-            if (obj->m_crosshair.y > height)
+            else
             {
-                obj->m_crosshair.y += height / 4;
-                float tmp = obj->m_crosshair.x;
-                obj->m_crosshair.x = width / 2 + 0.5f;
-                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
-                //obj->m_crosshair.y = 2.5f;
-                obj->m_crosshair.y = height / 4 + 0.5f;
-                obj->m_crosshair.x = tmp;
+                obj->m_crosshair.y += 20;
+                if (obj->m_crosshair.y > height)
+                {
+                    obj->m_crosshair.y += height / 4;
+                    float tmp = obj->m_crosshair.x;
+                    obj->m_crosshair.x = width / 2 + 0.5f;
+                    mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
+                    //obj->m_crosshair.y = 2.5f;
+                    obj->m_crosshair.y = height / 4 + 0.5f;
+                    obj->m_crosshair.x = tmp;
+                }
             }
             break;
         case GLFW_KEY_S:
@@ -322,8 +339,10 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                     obj->m_crosshair.y = obj->m_crosshairMandel.y - 20;
                     obj->m_crosshair.x = obj->m_crosshairMandel.x;
                 }
-                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) 
+                    * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
+                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) 
+                    * obj->m_zoomMandel + obj->m_offsetMandel.y;
                 obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
                 mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
                 //obj->m_offsetMandel.x = obj->m_offset.x;
@@ -331,17 +350,19 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                 obj->m_crosshairMandel.x = obj->m_crosshair.x;
                 obj->m_crosshairMandel.y = obj->m_crosshair.y;
             }
-            else 
-                obj->m_crosshair.y -= 20;
-            if (obj->m_crosshair.y < 0)
+            else
             {
-                obj->m_crosshair.y -= height / 4;
-                float tmp = obj->m_crosshair.x;
-                obj->m_crosshair.x = width / 2 + 0.5f;
-                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
-                //obj->m_crosshair.y = height - 2.5f;
-                obj->m_crosshair.y = height - (height / 4) - 0.5f;
-                obj->m_crosshair.x = tmp;
+                obj->m_crosshair.y -= 20;
+                if (obj->m_crosshair.y < 0)
+                {
+                    obj->m_crosshair.y -= height / 4;
+                    float tmp = obj->m_crosshair.x;
+                    obj->m_crosshair.x = width / 2 + 0.5f;
+                    mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
+                    //obj->m_crosshair.y = height - 2.5f;
+                    obj->m_crosshair.y = height - (height / 4) - 0.5f;
+                    obj->m_crosshair.x = tmp;
+                }
             }
             break;
         case GLFW_KEY_A:
@@ -355,8 +376,10 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                     obj->m_crosshair.y = obj->m_crosshairMandel.y;
                     obj->m_crosshair.x = obj->m_crosshairMandel.x - 20;
                 }
-                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) 
+                    * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
+                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) 
+                    * obj->m_zoomMandel + obj->m_offsetMandel.y;
                 obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
                 mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
                 //obj->m_offsetMandel.x = obj->m_offset.x;
@@ -365,15 +388,17 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                 obj->m_crosshairMandel.y = obj->m_crosshair.y;
             }
             else
-                obj->m_crosshair.x -= 20;
-            if (obj->m_crosshair.x < 0)
             {
-                obj->m_crosshair.x -= width / 4;
-                float tmp = obj->m_crosshair.y;
-                obj->m_crosshair.y = height / 2 + 0.5f;
-                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
-                obj->m_crosshair.x = width - (width / 4) - 0.5f;
-                obj->m_crosshair.y = tmp;
+                obj->m_crosshair.x -= 20;
+                if (obj->m_crosshair.x < 0)
+                {
+                    obj->m_crosshair.x -= width / 4;
+                    float tmp = obj->m_crosshair.y;
+                    obj->m_crosshair.y = height / 2 + 0.5f;
+                    mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
+                    obj->m_crosshair.x = width - (width / 4) - 0.5f;
+                    obj->m_crosshair.y = tmp;
+                }
             }
             break;
         case GLFW_KEY_D:
@@ -387,8 +412,10 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                     obj->m_crosshair.y = obj->m_crosshairMandel.y;
                     obj->m_crosshair.x = obj->m_crosshairMandel.x + 20;
                 }
-                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) 
+                    * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
+                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) 
+                    * obj->m_zoomMandel + obj->m_offsetMandel.y;
                 obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
 
                 mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
@@ -398,29 +425,38 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                 obj->m_crosshairMandel.y = obj->m_crosshair.y;
             }
             else
-                obj->m_crosshair.x += 20;
-            if (obj->m_crosshair.x > width)
             {
-                obj->m_crosshair.x += width / 4;
-                float tmp = obj->m_crosshair.y;
-                obj->m_crosshair.y = height / 2 + 0.5f;
-                mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
-                obj->m_crosshair.x = width / 4 + 0.5f;
-                obj->m_crosshair.y = tmp;
+                obj->m_crosshair.x += 20;
+                if (obj->m_crosshair.x > width)
+                {
+                    obj->m_crosshair.x += width / 4;
+                    float tmp = obj->m_crosshair.y;
+                    obj->m_crosshair.y = height / 2 + 0.5f;
+                    mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
+                    obj->m_crosshair.x = width / 4 + 0.5f;
+                    obj->m_crosshair.y = tmp;
+                }
             }
             break;
+
+        //BACKSPACE zooms out, ENTER zooms in
         case GLFW_KEY_BACKSPACE:
             mouse_button_callback(window, GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS, 0);
             break;
         case GLFW_KEY_ENTER:
             mouse_button_callback(window, GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS, 0);
             break;
+
+        //Pressing the J key activates Julia mode and renders a julia set for the given
+        //point C on the mandelbrot set pointed to by the crosshair
         case GLFW_KEY_J:
         {
             if (!obj->m_renderJulia)
             {
-                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoom + obj->m_offset.y;
+                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) 
+                    * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
+                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) 
+                    * obj->m_zoom + obj->m_offset.y;
                 obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
                 
                 obj->m_offsetMandel.x = obj->m_offset.x;
@@ -447,6 +483,8 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
             obj->m_crosshair.y = height / 2 + 0.5f;
             break;
         }
+
+        //Pressing N raises the exponent in Z^n + C by 1, P lowers it by 1
         case GLFW_KEY_N:
             obj->m_Shader.SetUniform1f("u_Exp", obj->m_Exp + 1.0f);
             obj->m_Exp++;
