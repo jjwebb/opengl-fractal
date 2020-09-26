@@ -90,3 +90,5 @@
 5	991	622783459	opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestFractal.cpp.obj	bd2cdcec57e44eb9
 2	998	622783459	opengl-fractal/src/CMakeFiles/fractal.dir/main.cpp.obj	632bd5c93fb8ce90
 998	1301	622783459	../../../opengl-fractal/fractal.exe	375d80eb0f88b68b
+2	1047	622790598	opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestFractal.cpp.obj	bd2cdcec57e44eb9
+1047	1191	622790599	../../../opengl-fractal/fractal.exe	375d80eb0f88b68b
