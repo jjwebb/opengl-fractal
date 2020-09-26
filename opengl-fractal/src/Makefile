@@ -125,6 +125,33 @@ fractal/fast:
 	cd /home/pi/opengl-fractal && $(MAKE) -f opengl-fractal/src/CMakeFiles/fractal.dir/build.make opengl-fractal/src/CMakeFiles/fractal.dir/build
 .PHONY : fractal/fast
 
+FrameBuffer.o: FrameBuffer.cpp.o
+
+.PHONY : FrameBuffer.o
+
+# target to build an object file
+FrameBuffer.cpp.o:
+	cd /home/pi/opengl-fractal && $(MAKE) -f opengl-fractal/src/CMakeFiles/fractal.dir/build.make opengl-fractal/src/CMakeFiles/fractal.dir/FrameBuffer.cpp.o
+.PHONY : FrameBuffer.cpp.o
+
+FrameBuffer.i: FrameBuffer.cpp.i
+
+.PHONY : FrameBuffer.i
+
+# target to preprocess a source file
+FrameBuffer.cpp.i:
+	cd /home/pi/opengl-fractal && $(MAKE) -f opengl-fractal/src/CMakeFiles/fractal.dir/build.make opengl-fractal/src/CMakeFiles/fractal.dir/FrameBuffer.cpp.i
+.PHONY : FrameBuffer.cpp.i
+
+FrameBuffer.s: FrameBuffer.cpp.s
+
+.PHONY : FrameBuffer.s
+
+# target to generate assembly for a file
+FrameBuffer.cpp.s:
+	cd /home/pi/opengl-fractal && $(MAKE) -f opengl-fractal/src/CMakeFiles/fractal.dir/build.make opengl-fractal/src/CMakeFiles/fractal.dir/FrameBuffer.cpp.s
+.PHONY : FrameBuffer.cpp.s
+
 IndexBuffer.o: IndexBuffer.cpp.o
 
 .PHONY : IndexBuffer.o
@@ -674,6 +701,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... fractal"
 	@echo "... edit_cache"
+	@echo "... FrameBuffer.o"
+	@echo "... FrameBuffer.i"
+	@echo "... FrameBuffer.s"
 	@echo "... IndexBuffer.o"
 	@echo "... IndexBuffer.i"
 	@echo "... IndexBuffer.s"

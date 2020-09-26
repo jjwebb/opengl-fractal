@@ -1,5 +1,6 @@
 #pragma once
 
+#include <time.h>
 #include "Test.h"
 #include "Texture.h"
 #include "Renderer.h"

@@ -465,7 +465,9 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                 obj->m_crosshair.y = height / 2 + 0.5f;
             }
             break;
-
+        case GLFW_KEY_ESCAPE:
+          glfwSetWindowShouldClose(window, GLFW_TRUE);
+          break;
         }
     }
 }

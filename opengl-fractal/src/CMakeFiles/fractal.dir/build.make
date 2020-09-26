@@ -57,9 +57,22 @@ include opengl-fractal/src/CMakeFiles/fractal.dir/progress.make
 # Include the compile flags for this target's objects.
 include opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 
+opengl-fractal/src/CMakeFiles/fractal.dir/FrameBuffer.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
+opengl-fractal/src/CMakeFiles/fractal.dir/FrameBuffer.cpp.o: opengl-fractal/src/FrameBuffer.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/FrameBuffer.cpp.o"
+	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/FrameBuffer.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/FrameBuffer.cpp
+
+opengl-fractal/src/CMakeFiles/fractal.dir/FrameBuffer.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/fractal.dir/FrameBuffer.cpp.i"
+	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/pi/opengl-fractal/opengl-fractal/src/FrameBuffer.cpp > CMakeFiles/fractal.dir/FrameBuffer.cpp.i
+
+opengl-fractal/src/CMakeFiles/fractal.dir/FrameBuffer.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/fractal.dir/FrameBuffer.cpp.s"
+	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/pi/opengl-fractal/opengl-fractal/src/FrameBuffer.cpp -o CMakeFiles/fractal.dir/FrameBuffer.cpp.s
+
 opengl-fractal/src/CMakeFiles/fractal.dir/IndexBuffer.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/IndexBuffer.cpp.o: opengl-fractal/src/IndexBuffer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/IndexBuffer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/IndexBuffer.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/IndexBuffer.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/IndexBuffer.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/IndexBuffer.cpp.i: cmake_force
@@ -72,7 +85,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/IndexBuffer.cpp.s: cmake_force
 
 opengl-fractal/src/CMakeFiles/fractal.dir/Renderer.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/Renderer.cpp.o: opengl-fractal/src/Renderer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/Renderer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/Renderer.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/Renderer.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/Renderer.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/Renderer.cpp.i: cmake_force
@@ -85,7 +98,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/Renderer.cpp.s: cmake_force
 
 opengl-fractal/src/CMakeFiles/fractal.dir/Shader.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/Shader.cpp.o: opengl-fractal/src/Shader.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/Shader.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/Shader.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/Shader.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/Shader.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/Shader.cpp.i: cmake_force
@@ -98,7 +111,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/Shader.cpp.s: cmake_force
 
 opengl-fractal/src/CMakeFiles/fractal.dir/Texture.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/Texture.cpp.o: opengl-fractal/src/Texture.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/Texture.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/Texture.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/Texture.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/Texture.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/Texture.cpp.i: cmake_force
@@ -111,7 +124,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/Texture.cpp.s: cmake_force
 
 opengl-fractal/src/CMakeFiles/fractal.dir/VertexArray.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/VertexArray.cpp.o: opengl-fractal/src/VertexArray.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/VertexArray.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/VertexArray.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/VertexArray.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/VertexArray.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/VertexArray.cpp.i: cmake_force
@@ -124,7 +137,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/VertexArray.cpp.s: cmake_force
 
 opengl-fractal/src/CMakeFiles/fractal.dir/VertexBuffer.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/VertexBuffer.cpp.o: opengl-fractal/src/VertexBuffer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/VertexBuffer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/VertexBuffer.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/VertexBuffer.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/VertexBuffer.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/VertexBuffer.cpp.i: cmake_force
@@ -137,7 +150,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/VertexBuffer.cpp.s: cmake_force
 
 opengl-fractal/src/CMakeFiles/fractal.dir/VertexBufferLayout.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/VertexBufferLayout.cpp.o: opengl-fractal/src/VertexBufferLayout.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/VertexBufferLayout.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/VertexBufferLayout.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/VertexBufferLayout.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/VertexBufferLayout.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/VertexBufferLayout.cpp.i: cmake_force
@@ -150,7 +163,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/VertexBufferLayout.cpp.s: cmake_force
 
 opengl-fractal/src/CMakeFiles/fractal.dir/main.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/main.cpp.o: opengl-fractal/src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/main.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/main.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/main.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/main.cpp.i: cmake_force
@@ -163,7 +176,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/main.cpp.s: cmake_force
 
 opengl-fractal/src/CMakeFiles/fractal.dir/tests/Test.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/tests/Test.cpp.o: opengl-fractal/src/tests/Test.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/tests/Test.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/tests/Test.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/tests/Test.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/tests/Test.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/tests/Test.cpp.i: cmake_force
@@ -176,7 +189,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/tests/Test.cpp.s: cmake_force
 
 opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestClearColor.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestClearColor.cpp.o: opengl-fractal/src/tests/TestClearColor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestClearColor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestClearColor.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/tests/TestClearColor.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/tests/TestClearColor.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestClearColor.cpp.i: cmake_force
@@ -189,7 +202,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestClearColor.cpp.s: cmake_forc
 
 opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestFractal.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestFractal.cpp.o: opengl-fractal/src/tests/TestFractal.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestFractal.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestFractal.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/tests/TestFractal.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/tests/TestFractal.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestFractal.cpp.i: cmake_force
@@ -202,7 +215,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestFractal.cpp.s: cmake_force
 
 opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestTexture.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestTexture.cpp.o: opengl-fractal/src/tests/TestTexture.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestTexture.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestTexture.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/tests/TestTexture.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/tests/TestTexture.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestTexture.cpp.i: cmake_force
@@ -215,7 +228,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/tests/TestTexture.cpp.s: cmake_force
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/glm/detail/glm.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/glm/detail/glm.cpp.o: opengl-fractal/src/vendor/glm/detail/glm.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/glm/detail/glm.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/glm/detail/glm.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/vendor/glm/detail/glm.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/vendor/glm/detail/glm.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/glm/detail/glm.cpp.i: cmake_force
@@ -228,7 +241,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/vendor/glm/detail/glm.cpp.s: cmake_for
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui.cpp.o: opengl-fractal/src/vendor/imgui/imgui.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/vendor/imgui/imgui.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/vendor/imgui/imgui.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui.cpp.i: cmake_force
@@ -241,7 +254,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui.cpp.s: cmake_force
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_demo.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_demo.cpp.o: opengl-fractal/src/vendor/imgui/imgui_demo.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_demo.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_demo.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/vendor/imgui/imgui_demo.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/vendor/imgui/imgui_demo.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_demo.cpp.i: cmake_force
@@ -254,7 +267,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_demo.cpp.s: cmake_f
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_draw.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_draw.cpp.o: opengl-fractal/src/vendor/imgui/imgui_draw.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_draw.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_draw.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/vendor/imgui/imgui_draw.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/vendor/imgui/imgui_draw.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_draw.cpp.i: cmake_force
@@ -267,7 +280,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_draw.cpp.s: cmake_f
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_glfw.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_glfw.cpp.o: opengl-fractal/src/vendor/imgui/imgui_impl_glfw.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_glfw.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_glfw.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_glfw.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/vendor/imgui/imgui_impl_glfw.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_glfw.cpp.i: cmake_force
@@ -280,7 +293,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_glfw.cpp.s: cm
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_opengl3.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_opengl3.cpp.o: opengl-fractal/src/vendor/imgui/imgui_impl_opengl3.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_opengl3.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_opengl3.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_opengl3.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/vendor/imgui/imgui_impl_opengl3.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_opengl3.cpp.i: cmake_force
@@ -293,7 +306,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_impl_opengl3.cpp.s:
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_widgets.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_widgets.cpp.o: opengl-fractal/src/vendor/imgui/imgui_widgets.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_widgets.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_widgets.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/vendor/imgui/imgui_widgets.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/vendor/imgui/imgui_widgets.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_widgets.cpp.i: cmake_force
@@ -306,7 +319,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/vendor/imgui/imgui_widgets.cpp.s: cmak
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/stb_image/stb_image.cpp.o: opengl-fractal/src/CMakeFiles/fractal.dir/flags.make
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/stb_image/stb_image.cpp.o: opengl-fractal/src/vendor/stb_image/stb_image.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/stb_image/stb_image.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object opengl-fractal/src/CMakeFiles/fractal.dir/vendor/stb_image/stb_image.cpp.o"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fractal.dir/vendor/stb_image/stb_image.cpp.o -c /home/pi/opengl-fractal/opengl-fractal/src/vendor/stb_image/stb_image.cpp
 
 opengl-fractal/src/CMakeFiles/fractal.dir/vendor/stb_image/stb_image.cpp.i: cmake_force
@@ -319,6 +332,7 @@ opengl-fractal/src/CMakeFiles/fractal.dir/vendor/stb_image/stb_image.cpp.s: cmak
 
 # Object files for target fractal
 fractal_OBJECTS = \
+"CMakeFiles/fractal.dir/FrameBuffer.cpp.o" \
 "CMakeFiles/fractal.dir/IndexBuffer.cpp.o" \
 "CMakeFiles/fractal.dir/Renderer.cpp.o" \
 "CMakeFiles/fractal.dir/Shader.cpp.o" \
@@ -343,6 +357,7 @@ fractal_OBJECTS = \
 # External object files for target fractal
 fractal_EXTERNAL_OBJECTS =
 
+opengl-fractal/fractal: opengl-fractal/src/CMakeFiles/fractal.dir/FrameBuffer.cpp.o
 opengl-fractal/fractal: opengl-fractal/src/CMakeFiles/fractal.dir/IndexBuffer.cpp.o
 opengl-fractal/fractal: opengl-fractal/src/CMakeFiles/fractal.dir/Renderer.cpp.o
 opengl-fractal/fractal: opengl-fractal/src/CMakeFiles/fractal.dir/Shader.cpp.o
@@ -367,7 +382,7 @@ opengl-fractal/fractal: opengl-fractal/src/CMakeFiles/fractal.dir/build.make
 opengl-fractal/fractal: /usr/lib/arm-linux-gnueabihf/libGL.so
 opengl-fractal/fractal: /usr/lib/libGLEW.so
 opengl-fractal/fractal: opengl-fractal/src/CMakeFiles/fractal.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Linking CXX executable ../fractal"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/pi/opengl-fractal/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Linking CXX executable ../fractal"
 	cd /home/pi/opengl-fractal/opengl-fractal/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/fractal.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

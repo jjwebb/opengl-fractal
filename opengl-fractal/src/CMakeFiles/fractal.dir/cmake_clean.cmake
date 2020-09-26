@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/fractal.dir/FrameBuffer.cpp.o"
   "CMakeFiles/fractal.dir/IndexBuffer.cpp.o"
   "CMakeFiles/fractal.dir/Renderer.cpp.o"
   "CMakeFiles/fractal.dir/Shader.cpp.o"
