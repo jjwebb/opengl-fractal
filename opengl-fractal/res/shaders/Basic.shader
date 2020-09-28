@@ -1,5 +1,5 @@
 #shader vertex
-#version 310 es
+#version 100
 
 precision mediump float;
 
@@ -17,7 +17,7 @@ void main()
 };
 
 #shader fragment
-#version 310 es
+#version 100
 
 precision mediump float;
 

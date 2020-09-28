@@ -1,0 +1,11 @@
+/home/pi/opengl-fractal/Dependencies/glew-2.1.0/build/CMakeFiles/install/strip.dir
+/home/pi/opengl-fractal/Dependencies/glew-2.1.0/build/CMakeFiles/install/local.dir
+/home/pi/opengl-fractal/Dependencies/glew-2.1.0/build/CMakeFiles/install.dir
+/home/pi/opengl-fractal/Dependencies/glew-2.1.0/build/CMakeFiles/rebuild_cache.dir
+/home/pi/opengl-fractal/Dependencies/glew-2.1.0/build/CMakeFiles/glew_s.dir
+/home/pi/opengl-fractal/Dependencies/glew-2.1.0/build/CMakeFiles/list_install_components.dir
+/home/pi/opengl-fractal/Dependencies/glew-2.1.0/build/CMakeFiles/visualinfo.dir
+/home/pi/opengl-fractal/Dependencies/glew-2.1.0/build/CMakeFiles/uninstall.dir
+/home/pi/opengl-fractal/Dependencies/glew-2.1.0/build/CMakeFiles/glew.dir
+/home/pi/opengl-fractal/Dependencies/glew-2.1.0/build/CMakeFiles/glewinfo.dir
+/home/pi/opengl-fractal/Dependencies/glew-2.1.0/build/CMakeFiles/edit_cache.dir

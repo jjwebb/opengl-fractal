@@ -30,7 +30,7 @@ test::TestTexture::TestTexture()
     m_layout.Push<float>(2);
     m_layout.Push<float>(2);
 
-    m_va.AddBuffer(m_vb, m_layout);
+    m_va.AddBuffer(&m_vb, &m_layout);
 
     m_Shader.Bind();
     //m_Shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);

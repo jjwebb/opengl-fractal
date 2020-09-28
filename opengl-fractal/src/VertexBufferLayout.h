@@ -2,7 +2,8 @@
 
 #include<GL/glew.h>
 #include<vector>
-#include "Renderer.h"
+#include <assert.h>
+//#include "Renderer.h"
 
 struct VertexBufferElement
 {
@@ -18,7 +19,7 @@ struct VertexBufferElement
 			case GL_UNSIGNED_INT:	return 4;
 			case GL_UNSIGNED_BYTE:	return 1;
 		}
-		ASSERT(false);
+		assert(false);
 		return 0;
 	}
 };

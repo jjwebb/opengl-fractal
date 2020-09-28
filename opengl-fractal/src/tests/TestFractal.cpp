@@ -45,7 +45,7 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_layout.Push<float>(2);
     //m_layout.Push<float>(2);
 
-    m_va.AddBuffer(m_vb, m_layout);
+    m_va.AddBuffer(&m_vb, &m_layout);
 
     m_Shader.Bind();
     //m_Shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
@@ -72,6 +72,10 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     glfwSetMouseButtonCallback(m_window, mouse_button_callback);
     glfwSetKeyCallback(m_window, key_callback);
 
+    int x, y;
+    glfwGetFramebufferSize(m_window, &x, &y);
+    m_crosshair.x = x / 2 + 0.5f;
+    m_crosshair.y = y / 2 + 0.5f;
     m_Shader.SetUniformMat4f("u_MVP", m_proj);
     m_Shader.SetUniform2f("u_offset", m_offset.x, m_offset.y);
     m_Shader.SetUniform1f("u_zoom", m_zoom);
@@ -266,7 +270,9 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
         auto start = std::chrono::high_resolution_clock::now();
         obj->m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
         obj->m_fb.renderToTexture();                        //rendering the same image over and over
+        //obj->m_va.Bind();
         obj->OnRender();
+        GLCall(glFinish());
         auto elapsed = std::chrono::high_resolution_clock::now() - start;
         obj->m_renderTime = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
         obj->m_Shader.SetUniform1i("u_renderToTexture", 0);

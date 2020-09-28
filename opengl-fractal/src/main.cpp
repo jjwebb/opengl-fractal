@@ -36,11 +36,11 @@ int main(void)
         return -1;
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1280, 800, "Mandelbrot", glfwGetPrimaryMonitor(), NULL);
+    window = glfwCreateWindow(1280, 800, "Mandelbrot", NULL, NULL);
     const char * err;
     int code = glfwGetError(&err);
     if (err != GLFW_NO_ERROR)
@@ -62,6 +62,7 @@ int main(void)
 
     glfwSetCursorPosCallback(window, cursorCallback);
 
+    glewExperimental=true;
     if (glewInit() != GLEW_OK)
         std::cout << "glewInit error!";
 
@@ -79,7 +80,7 @@ int main(void)
         glGetIntegerv(GL_NUM_SHADING_LANGUAGE_VERSIONS, &versions);
         char* str = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
         std::cout<<"Version: "<<str<<std::endl;
-        ImGui_ImplOpenGL3_Init("#version 300 es");
+        ImGui_ImplOpenGL3_Init("#version 100");
 
         //test::TestClearColor testClearColor;
         //test::TestTexture testTexture;
