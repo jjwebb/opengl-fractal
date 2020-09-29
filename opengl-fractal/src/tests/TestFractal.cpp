@@ -72,6 +72,10 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     glfwSetMouseButtonCallback(m_window, mouse_button_callback);
     glfwSetKeyCallback(m_window, key_callback);
 
+    int x, y;
+    glfwGetFramebufferSize(m_window, &x, &y);
+    m_crosshair.x = x / 2 + 0.5f;
+    m_crosshair.y = y / 2 + 0.5f;
     m_Shader.SetUniformMat4f("u_MVP", m_proj);
     m_Shader.SetUniform2f("u_offset", m_offset.x, m_offset.y);
     m_Shader.SetUniform1f("u_zoom", m_zoom);
