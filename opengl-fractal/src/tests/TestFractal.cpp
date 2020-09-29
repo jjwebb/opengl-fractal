@@ -1,3 +1,4 @@
+#include<iomanip>
 #include "TestFractal.h"
 
 #include "glm/gtc/matrix_transform.hpp"
@@ -511,6 +512,24 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
         case GLFW_KEY_ESCAPE:
           glfwSetWindowShouldClose(window, GLFW_TRUE);
           break;
+        case GLFW_KEY_Z:
+            float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
+            float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) * obj->m_zoom + obj->m_offset.y;
+            int iter;
+            float x = 0.0f; float y = 0.0f; float xtmp = 0.0f;
+            float xLast = 0.0f;
+            for (iter = 0; iter < 100; iter++)
+            {
+                xtmp = x * x - y * y + cx;
+                y = 2.0f * x * y + cy;
+                if (xtmp * xtmp + y * y > 4.0f)
+                    break;
+                xLast = x;
+                x = xtmp;
+                std::cout << std::setprecision(50) << "X: " << x << " Y: " << y << " X==Xlast: " << (x == xLast) << std::endl;
+            }
+            std::cout << std::setprecision(50) << "X: " << x << " Y: " << y << " iter: " << iter << std::endl << std::endl;
+            break;
         }
     }
 }

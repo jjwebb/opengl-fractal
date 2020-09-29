@@ -121,7 +121,9 @@ void main()
 		//cy = cy0 - cy;
 		//cx = cx0 - cx;
 		float x = 0.0f; float y = 0.0f; float xtmp = 0.0f;
-
+		float lastx = 0.0f;
+		int n = 1;
+		int n2 = 3;
 		if (u_Exp == 2.0f)
 		{
 			for (iter = 0; iter < ITER_MAX; iter++)
@@ -130,6 +132,19 @@ void main()
 				zy = 2.0f * zx * zy + u_cVals.y;
 				if (xtmp * xtmp + zy * zy > 4.0f)
 					break;
+				if (xtmp == lastx)
+				{
+					//iter = ITER_MAX;//commenting out this line makes for some very interesting coloration
+					break;
+				}
+
+				if (n2 % n == 0)
+				{
+					lastx = xtmp;
+					n2 = 0;
+					n++;
+				}
+				n2++;
 				zx = xtmp;
 			}
 		}
