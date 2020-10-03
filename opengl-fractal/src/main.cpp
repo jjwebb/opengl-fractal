@@ -40,14 +40,14 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1280, 800, "Mandelbrot", NULL, NULL);
+    window = glfwCreateWindow(1280, 720, "Mandelbrot", NULL, NULL);
     const char * err;
     int code = glfwGetError(&err);
     if (err != GLFW_NO_ERROR)
     {
         std::cout<<"GLFW error "<<code<<": "<<err<<std::endl;
     }
-    glfwSetWindowAspectRatio(window, 16, 10);
+    glfwSetWindowAspectRatio(window, 16, 9);
     if (!window)
     {
         glfwTerminate();

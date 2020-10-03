@@ -6,6 +6,18 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#define XMUL 5.0f
+//#define XSUBT 2.8125f
+//With a X/Y ratio of 5.0/2.8125 (16:9) the center of the screen is at
+//C coords (-.310547, .001953). We have to add this into our equation for 
+//the zoom to scale properly
+#define XSUBT 2.501953f
+#define YMUL 2.8125f
+//#define YSUBT 1.40625f
+#define YSUBT 1.408203f
+//#define XADD 0.310547f
+//#define YADD -0.001953f
+
 test::TestFractal::TestFractal(GLFWwindow* window)
     : //m_Texture("res/textures/peach.png"),
     //m_window(glfwCreateWindow(1440, 900, "Mandelbrot", NULL, NULL)),
@@ -32,7 +44,7 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_proj(glm::ortho(0.0f, 1440.0f, 0.0f, 900.0f, -1.0f, 1.0f)),
     m_crosshair(720.5f, 450.5f),
     m_crosshairMandel(0.0f, 0.0f),
-    //m_offset(0.598333f, -0.001667f),
+    //m_offset(XADD, -YADD),
     m_offset(0.0f, 0.0f),
     m_offsetMandel(0.0f, 0.0f),
     m_zoom(1.0f),
@@ -49,26 +61,7 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_va.AddBuffer(m_vb, m_layout);
 
     m_Shader.Bind();
-    //m_Shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-    //m_Texture.Bind();
-    //m_Shader.SetUniform1i("u_Texture", 0);
-    //m_Shader.SetUniform1i("u_Texture", 0);
-    
-    //glfwSetWindowAspectRatio(m_window, 16, 10);
-    //if (!m_window)
-    //{
-    //    glfwTerminate();
-    //    return;
-    //}
-
-
-    ///* Make the window's context current */
-    //glfwMakeContextCurrent(m_window);
-
-    //glfwSwapInterval(1);
-
-    //glfwSetCursorPosCallback(m_window, cursorCallback);
-
+  
     glfwSetWindowUserPointer(m_window, this);
     glfwSetMouseButtonCallback(m_window, mouse_button_callback);
     glfwSetKeyCallback(m_window, key_callback);
@@ -126,25 +119,7 @@ void test::TestFractal::OnUpdate(float deltaTime)
 void test::TestFractal::OnRender()
 {
     m_Renderer.Clear();
-
-    //m_Shader.Bind();
-    //m_ib.Bind();
-    {
-       // glm::mat4 scale = glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f))
-       //     , glm::vec3(m_scale[0], m_scale[1], 1.0f));
-        //m_scale[1] = m_scale[0];
-        //glm::mat4 model = glm::scale(glm::translate(glm::mat4(1.0f), m_translationA),
-        //    glm::vec3(m_scale[0], m_scale[1], m_scale[2]));//scale first, translation second
-        //glm::mat4 mvp = m_proj * m_view * model;
-        //glm::mat4 mvp = m_proj * scale;
-
-        //m_Shader.SetUniformMat4f("u_MVP", m_proj);
-        //fractalWindow();
-        //shader.Bind();
-        m_Renderer.Draw(m_va, m_ib, m_Shader);
-        
-    }
-
+    m_Renderer.Draw(m_va, m_ib, m_Shader);
 }
 
 void test::TestFractal::OnImGuiRender()
@@ -152,14 +127,10 @@ void test::TestFractal::OnImGuiRender()
     int x, y;
     glfwGetFramebufferSize(m_window, &x, &y);
     
-    float cx = (((((m_crosshair.x) / x)) * 4.8f - 3.0f) + 0.598333f) 
-        *  m_zoom + m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-    float cy = (((((m_crosshair.y) / y)) * 3.0f - 1.5f) + 0.001667f) 
+    float cx = ((m_crosshair.x / x) * XMUL - XSUBT)
+        * m_zoom + m_offset.x; //translate screen coords to -3 to 1.8, 4.8
+    float cy = ((m_crosshair.y / y) * YMUL - YSUBT)
         * m_zoom + m_offset.y;
-
-    //float mz = m_zoom / 2;
-    //float x1 = (m_crosshair.x + m_offset.x) / (mz * mz) + (3.0f * x * mz * mz - 3.0f * x) / (4.8f * mz * mz) - m_crosshair.x;
-    //float y1 = (m_crosshair.y + m_offset.y) / (mz * mz) + (1.5f * y * mz * mz - 1.5f * y) / (3.0f * mz * mz) - m_crosshair.y;
 
     double xp, yp;
     glfwGetCursorPos(m_window, &xp, &yp);
@@ -189,46 +160,9 @@ void test::TestFractal::OnImGuiRender()
     }
 }
 
-//void test::TestFractal::fractalWindow()
-//{
-//    double xpos, ypos;
-//    while (!glfwWindowShouldClose(m_window))
-//    {
-//        glfwGetCursorPos(m_window, &xpos, &ypos);
-//        //GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-//        GLCall(glClear(GL_COLOR_BUFFER_BIT));
-//        //renderer.Clear();
-//
-//        ImGui_ImplOpenGL3_NewFrame();
-//        ImGui_ImplGlfw_NewFrame();
-//        ImGui::NewFrame();
-//
-//        /*if (ImGui::Button("Test Color"))
-//            test = &testClearColor;
-//        else if (ImGui::Button("Test Textures"))
-//            test = &testTexture;*/
-//
-//            //OnUpdate(0.0f);
-//            //OnRender();
-//            ImGui::Begin("Test");
-//            ImGui::Text("X pos: %f Y pos: %f", xpos, ypos);
-//            OnImGuiRender();
-//            ImGui::End();
-//        }
-//
-//        ImGui::Render();
-//        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-//
-//        glfwSwapBuffers(m_window);
-//
-//        /* Poll for and process events */
-//        glfwPollEvents();
-//}
-
 void test::TestFractal::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
     
-
 }
 
 void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -241,9 +175,9 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
         int x, y;
         glfwGetFramebufferSize(window, &x, &y);
 
-        float cx = (((((obj->m_crosshair.x) / x)) * 4.8f - 3.0f) + 0.598333f) 
+        float cx = ((obj->m_crosshair.x / x) * XMUL - XSUBT)
             * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-        float cy = (((((obj->m_crosshair.y) / y)) * 3.0f - 1.5f) + 0.001667f) 
+        float cy = ((obj->m_crosshair.y / y) * YMUL - YSUBT)
             * obj->m_zoom + obj->m_offset.y;
 
         if (!obj->m_renderJulia || mods == 0)
@@ -308,9 +242,9 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                     obj->m_crosshair.y = obj->m_crosshairMandel.y +20;
                     obj->m_crosshair.x = obj->m_crosshairMandel.x;
                 }
-                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) 
+                float cx = ((obj->m_crosshair.x / width) * XMUL - XSUBT)
                     * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) 
+                float cy = ((obj->m_crosshair.y / height) * YMUL - YSUBT)
                     * obj->m_zoomMandel + obj->m_offsetMandel.y;
                 obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
                 mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
@@ -345,9 +279,9 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                     obj->m_crosshair.y = obj->m_crosshairMandel.y - 20;
                     obj->m_crosshair.x = obj->m_crosshairMandel.x;
                 }
-                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) 
+                float cx = ((obj->m_crosshair.x / width) * XMUL - XSUBT)
                     * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) 
+                float cy = ((obj->m_crosshair.y / height) * YMUL - YSUBT)
                     * obj->m_zoomMandel + obj->m_offsetMandel.y;
                 obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
                 mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
@@ -382,9 +316,9 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                     obj->m_crosshair.y = obj->m_crosshairMandel.y;
                     obj->m_crosshair.x = obj->m_crosshairMandel.x - 20;
                 }
-                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) 
+                float cx = ((obj->m_crosshair.x / width) * XMUL - XSUBT)
                     * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) 
+                float cy = ((obj->m_crosshair.y / height) * YMUL - YSUBT)
                     * obj->m_zoomMandel + obj->m_offsetMandel.y;
                 obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
                 mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
@@ -418,9 +352,9 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
                     obj->m_crosshair.y = obj->m_crosshairMandel.y;
                     obj->m_crosshair.x = obj->m_crosshairMandel.x + 20;
                 }
-                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) 
+                float cx = ((obj->m_crosshair.x / width) * XMUL - XSUBT)
                     * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) 
+                float cy = ((obj->m_crosshair.y / height) * YMUL - YSUBT)
                     * obj->m_zoomMandel + obj->m_offsetMandel.y;
                 obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
 
@@ -459,9 +393,9 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
         {
             if (!obj->m_renderJulia)
             {
-                float cx = (((((obj->m_crosshair.x) / width)) * 4.8f - 3.0f) + 0.598333f) 
+                float cx = ((obj->m_crosshair.x / width) * XMUL - XSUBT)
                     * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = (((((obj->m_crosshair.y) / height)) * 3.0f - 1.5f) + 0.001667f) 
+                float cy = ((obj->m_crosshair.y / height) * YMUL - YSUBT)
                     * obj->m_zoom + obj->m_offset.y;
                 obj->m_Shader.SetUniform2f("u_cVals", cx, cy);
                 

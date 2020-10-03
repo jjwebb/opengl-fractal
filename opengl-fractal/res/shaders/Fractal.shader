@@ -21,11 +21,20 @@ void main()
 
 precision highp float;
 #define ITER_MAX 200
+#define XMUL 5.0f
+#define XSUBT 2.501953f
+//#define XSUBT 2.8125f
+#define YMUL 2.8125f
+#define YSUBT 1.408203f
+//#define YSUBT 1.40625f
+
+//#define XADD 0.310547f
+//#define YADD -0.001953f
 
 out vec4 color;
 
 in vec2 v_TexCoord;
-//this is a comment
+
 uniform vec4 u_Color;
 uniform vec2 u_FramebufferSize;
 uniform vec2 u_crossHairCoord;
@@ -36,7 +45,6 @@ uniform float u_Exp;
 uniform int u_renderToTexture;
 uniform bool u_julia;
 uniform sampler2D u_Texture;
-//uniform sampler2D u_Texture;
 
 void main()
 {
@@ -63,28 +71,17 @@ void main()
 			return;
 		}
 	}
-	//float x1 = ( gl_FragCoord.x +  u_offset.x) / (u_zoom*u_zoom) + (3.0f * u_FramebufferSize.x * u_zoom * u_zoom - 3.0f * u_FramebufferSize.x) / (4.8f * u_zoom * u_zoom) - gl_FragCoord.x;
-	//float y1 = ( gl_FragCoord.y +  u_offset.y) / (u_zoom*u_zoom) + (1.5f * u_FramebufferSize.y * u_zoom * u_zoom - 1.5f * u_FramebufferSize.y) / (3.0f * u_zoom * u_zoom) - gl_FragCoord.y;
-	
-	//vec4 texColor = texture(u_Texture, v_TexCoord);
-   //color = texColor;
-	//float cx0 = ((((gl_FragCoord.x + x1) / u_FramebufferSize.x)) * 4.8f - 3.0f) * u_zoom; //translate screen coords to -3 to 1.8, 4.8
-	//float cy0 = ((((gl_FragCoord.y + u_offset.y) / u_FramebufferSize.y)) * 3.0 - 1.5f) * u_zoom;
-	//color = vec4(gl_FragCoord.x/u_FramebufferSize.x, gl_FragCoord.y/u_FramebufferSize.y, 0.0f, 1.0f);
-	//float cx = ((((gl_FragCoord.x+ x1) / u_FramebufferSize.x)) * 4.8f - 3.0f) * u_zoom/*+ 2*u_offset.x / u_FramebufferSize.x*/; //translate screen coords to -3 to 1.8, 4.8
-	//float cy = ((((gl_FragCoord.y + y1) / u_FramebufferSize.y)) * 3.0 - 1.5f) * u_zoom/*+ 2*u_offset.y / u_FramebufferSize.y*/; //1.5 to -1.5, 3.0
-	
+
 	int iter;
 	if (!u_julia)
 	{
-		float cx = (((((gl_FragCoord.x /*+ u_offset.x*/) / u_FramebufferSize.x)) * 4.8f - 3.0f) + 0.598333f) * u_zoom;
-		float cy = (((((gl_FragCoord.y /*+ u_offset.y*/) / u_FramebufferSize.y)) * 3.0f - 1.5f) + 0.001667f) * u_zoom;
-		//Adding 0.598333f and 0.00167f make the starting point equal to 0 and makes zoom scale correctly
+		// XMUL/YMUL must be == screen ratio, otherwise the image will be squished
+		float cx = ((gl_FragCoord.x / u_FramebufferSize.x) * XMUL - XSUBT) * u_zoom;
+		float cy = ((gl_FragCoord.y / u_FramebufferSize.y) * YMUL - YSUBT) * u_zoom;
+
 		cx += u_offset.x;
 		cy += u_offset.y;
-			//range of 4.8/3.0 = 1.6, same aspect ratio as window is locked to. 4.0/3.0 resulted in squished image 
-		//cy = cy0 - cy;
-		//cx = cx0 - cx;
+
 		float x=0.0f; float y = 0.0f; float xtmp = 0.0f;
 
 		if(u_Exp == 2.0f)
@@ -112,14 +109,12 @@ void main()
 	}
 	else if (u_julia)
 	{
-		float zx = (((((gl_FragCoord.x /*+ u_offset.x*/) / u_FramebufferSize.x)) * 4.8f - 3.0f) + 0.598333f) * u_zoom;
-		float zy = (((((gl_FragCoord.y /*+ u_offset.y*/) / u_FramebufferSize.y)) * 3.0f - 1.5f) + 0.001667f) * u_zoom;
-		//Adding 0.598333f and 0.00167f make the starting point equal to 0 and makes zoom scale correctly
+		float zx = ((gl_FragCoord.x / u_FramebufferSize.x) * XMUL - XSUBT) * u_zoom;
+		float zy = ((gl_FragCoord.y / u_FramebufferSize.y) * YMUL - YSUBT) * u_zoom;
+
 		zx += u_offset.x;
 		zy += u_offset.y;
-		//range of 4.8/3.0 = 1.6, same aspect ratio as window is locked to. 4.0/3.0 resulted in squished image 
-		//cy = cy0 - cy;
-		//cx = cx0 - cx;
+
 		float x = 0.0f; float y = 0.0f; float xtmp = 0.0f;
 		float lastx = 0.0f;
 		int n = 1;
@@ -166,7 +161,6 @@ void main()
 		color = vec4(1.0f, 1.0f, 1.0f, 1.0f);*/
 	//else
 	float iterf = float(iter);
-		color = vec4(0.0f, 0.0f, 1.0f - iterf / float(ITER_MAX), 1.0f);
-	
+	color = vec4(0.0f, 0.0f, 1.0f - iterf / float(ITER_MAX), 1.0f);
 	
 };
