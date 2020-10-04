@@ -447,25 +447,69 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
           glfwSetWindowShouldClose(window, GLFW_TRUE);
           break;
         case GLFW_KEY_Z:
-            float cx = ((obj->m_crosshair.x / width) * XMUL - XSUBT)
-                * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-            float cy = ((obj->m_crosshair.y / height) * YMUL - YSUBT)
-                * obj->m_zoom + obj->m_offset.y;
-            int iter;
-            float x = 0.0f; float y = 0.0f; float xtmp = 0.0f;
-            float xLast = 0.0f;
-            for (iter = 0; iter < 100; iter++)
+            if (!obj->m_renderJulia)
             {
-                xtmp = x * x - y * y + cx;
-                y = 2.0f * x * y + cy;
-                if (xtmp * xtmp + y * y > 4.0f)
-                    break;
-                xLast = x;
-                x = xtmp;
-                std::cout << std::setprecision(50) << "X: " << x << " Y: " << y << " X==Xlast: " << (x == xLast) << std::endl;
+                float cx = ((obj->m_crosshair.x / width) * XMUL - XSUBT)
+                    * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
+                float cy = ((obj->m_crosshair.y / height) * YMUL - YSUBT)
+                    * obj->m_zoom + obj->m_offset.y;
+                int iter;
+                float x = 0.0f; float y = 0.0f; float xtmp = 0.0f;
+                float xLast = 0.0f;
+                for (iter = 0; iter < 100; iter++)
+                {
+                    xtmp = x * x - y * y + cx;
+                    y = 2.0f * x * y + cy;
+                    if (xtmp * xtmp + y * y > 4.0f)
+                        break;
+                    xLast = x;
+                    x = xtmp;
+                    std::cout << std::setprecision(50) << "X: " << x << " Y: " << y << " X==Xlast: " << (x == xLast) << std::endl;
+                }
+                std::cout << std::setprecision(50) << "X: " << x << " Y: " << y << " iter: " << iter << std::endl << std::endl;
+                break;
             }
-            std::cout << std::setprecision(50) << "X: " << x << " Y: " << y << " iter: " << iter << std::endl << std::endl;
-            break;
+            else
+            {
+                float cx = ((obj->m_crosshairMandel.x / width) * XMUL - XSUBT)
+                    * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
+                float cy = ((obj->m_crosshairMandel.y / height) * YMUL - YSUBT)
+                    * obj->m_zoomMandel + obj->m_offsetMandel.y;
+
+                float zx = ((obj->m_crosshair.x / width) * XMUL - XSUBT)
+                    * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
+                float zy = ((obj->m_crosshair.y / height) * YMUL - YSUBT)
+                    * obj->m_zoom + obj->m_offset.y;
+                int iter;
+                float xtmp = 0.0f;
+                float lastx = 0.0f;
+                int n = 1;
+                int n2 = 3;
+                for (iter = 0; iter < 100; iter++)
+                {
+                    xtmp = zx * zx - zy * zy + cx;
+                    zy = 2.0f * zx * zy + cy;
+                    if (xtmp * xtmp + zy * zy > 4.0f)
+                        break;
+                    std::cout << std::setprecision(50) << "ZX: " << zx << " ZY: " << zy << " X==Xlast: " << (xtmp == lastx) << std::endl;
+                    if (xtmp == lastx)
+                    {
+                        //iter = ITER_MAX;//commenting out this line makes for some very interesting coloration
+                        break;
+                    }
+                    if (n2 % n == 0)
+                    {
+                        lastx = xtmp;
+                        n2 = 0;
+                        n++;
+                    }
+                    n2++;
+                    zx = xtmp;
+                }
+                std::cout << std::setprecision(50) << "ZX: " << zx << " ZY: " << zy << " iter: " << iter << 
+                    " n2: " << n2 << " n: " << n << std::endl << std::endl;
+                break;
+            }
         }
     }
 }

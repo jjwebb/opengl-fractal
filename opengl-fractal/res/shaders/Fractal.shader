@@ -115,7 +115,7 @@ void main()
 		zx += u_offset.x;
 		zy += u_offset.y;
 
-		float x = 0.0f; float y = 0.0f; float xtmp = 0.0f;
+		float xtmp = 0.0f;
 		float lastx = 0.0f;
 		int n = 1;
 		int n2 = 3;
