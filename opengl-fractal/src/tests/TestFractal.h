@@ -41,6 +41,7 @@ namespace test {
 		float m_Exp;
 		bool m_renderJulia;
 		long long m_renderTime;
+		int m_scaleFactor; //For scaling window coordinates and dimensions to smaller textures
 		//void fractalWindow();
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);

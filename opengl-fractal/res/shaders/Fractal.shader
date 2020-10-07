@@ -116,9 +116,9 @@ void main()
 		zy += u_offset.y;
 
 		float xtmp = 0.0f;
-		float lastx = 0.0f;
-		int n = 1;
-		int n2 = 3;
+		//float lastx = 0.0f;
+		//int n = 1;
+		//int n2 = 3;
 		if (u_Exp == 2.0f)
 		{
 			for (iter = 0; iter < ITER_MAX; iter++)
@@ -127,7 +127,7 @@ void main()
 				zy = 2.0f * zx * zy + u_cVals.y;
 				if (xtmp * xtmp + zy * zy > 4.0f)
 					break;
-				if (xtmp == lastx)
+				/*if (xtmp == lastx)
 				{
 					//iter = ITER_MAX;//commenting out this line makes for some very interesting coloration
 					break;
@@ -139,7 +139,7 @@ void main()
 					n2 = 0;
 					n++;
 				}
-				n2++;
+				n2++;*/
 				zx = xtmp;
 			}
 		}

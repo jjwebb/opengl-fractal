@@ -26,9 +26,9 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_Renderer(),
     m_positions{
         0.0f, 0.0f, 0.0f, 0.0f,
-        1440.0f, 0.0f, 1.0f, 0.0f,
-        1440.0f, 900.0f, 1.0f, 1.0f,
-        0.0f, 900.0f, 0.0f, 1.0f
+        1920.0f, 0.0f, 1.0f, 0.0f,
+        1920.0f, 720.0f, 1.0f, 1.0f,
+        0.0f, 720.0f, 0.0f, 1.0f
     },
     m_indices{
         0, 1, 2,
@@ -41,7 +41,7 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_fb(window),
     //m_translationA(200, 200, 0),
     m_scale(1.0f, 1.0f, 1.0f),
-    m_proj(glm::ortho(0.0f, 1440.0f, 0.0f, 900.0f, -1.0f, 1.0f)),
+    m_proj(glm::ortho(0.0f, 1920.0f, 0.0f, 720.0f, -1.0f, 1.0f)),
     m_crosshair(720.5f, 450.5f),
     m_crosshairMandel(0.0f, 0.0f),
     //m_offset(XADD, -YADD),
@@ -51,7 +51,8 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_zoomMandel(0.0f),
     m_Exp(2.0f),
     m_renderJulia(false),
-    m_renderTime(0)
+    m_renderTime(0),
+    m_scaleFactor(1)
     //m_view(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
 {
     m_layout.Push<float>(2);
@@ -74,15 +75,15 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_Shader.SetUniform2f("u_offset", m_offset.x, m_offset.y);
     m_Shader.SetUniform1f("u_zoom", m_zoom);
     m_Shader.SetUniform1f("u_Exp", m_Exp);
-    m_Shader.SetUniform1i("u_Texture", 0);
+    //m_Shader.SetUniform1i("u_Texture", 0);
     m_Shader.SetUniform1i("u_julia", m_renderJulia);
 
     OnUpdate(0.0f);
-    m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
-    m_fb.renderToTexture();                        //rendering the same image over and over
-    OnRender();
-    m_Shader.SetUniform1i("u_renderToTexture", 0);
-    m_fb.renderToScreen();
+    //m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
+    //m_fb.renderToTexture(m_scaleFactor);           //rendering the same image over and over
+    //OnRender();
+    //m_Shader.SetUniform1i("u_renderToTexture", 0);
+    //m_fb.renderToScreen();
     OnRender();
 }
 
@@ -96,24 +97,27 @@ test::TestFractal::~TestFractal()
 void test::TestFractal::OnUpdate(float deltaTime)
 {
     int x, y;
-
     glfwGetFramebufferSize(m_window, &x, &y);
-    //float xf = (float)x;
-    //float yf = (float)y;
-    m_Shader.SetUniform2f("u_FramebufferSize", (float)x, (float)y);
-    //yf = xf * 0.625f;
-    //m_proj = glm::ortho(0.0f, xf, 0.0f, yf, -1.0f, 1.0f);
-    //m_proj = glm::ortho(xf, 0.0f, yf, 0.0f, -1.0f, 1.0f);
-    //m_scale[0] = xf / 1440;
-    //m_scale[1] = yf / 900;
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    GLCall(glViewport(0, 0, x, y));
 
-    double xp, yp;
-    glfwGetCursorPos(m_window, &xp, &yp);
-    //m_crosshair.x = (float)xp + 0.5f; 
-    //m_crosshair.y = y - ((float)yp + 0.5f);
+    if (m_scaleFactor > 0)
+    {
+        m_Shader.SetUniform2f("u_FramebufferSize", (float)(x/m_scaleFactor), (float)(y/m_scaleFactor));
+        m_Shader.SetUniform2f("u_crossHairCoord", m_crosshair.x/m_scaleFactor, m_crosshair.y/m_scaleFactor);
+
+        auto start = std::chrono::high_resolution_clock::now();
+        m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
+        m_fb.renderToTexture(m_scaleFactor);      //rendering the same image over and over
+        OnRender();
+        GLCall(glFinish());
+        m_scaleFactor--;
+        auto elapsed = std::chrono::high_resolution_clock::now() - start;
+        m_renderTime = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+        m_Shader.SetUniform1i("u_renderToTexture", 0);
+        m_fb.renderToScreen();
+    }
+    m_Shader.SetUniform2f("u_FramebufferSize", (float)x, (float)y);
     m_Shader.SetUniform2f("u_crossHairCoord", m_crosshair.x, m_crosshair.y);
+    
 }
 
 void test::TestFractal::OnRender()
@@ -202,15 +206,19 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
         obj->m_Shader.SetUniform2f("u_offset", obj->m_offset.x, obj->m_offset.y);
         obj->m_Shader.SetUniform1f("u_zoom", obj->m_zoom);
 
-        auto start = std::chrono::high_resolution_clock::now();
-        obj->m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
-        obj->m_fb.renderToTexture();                        //rendering the same image over and over
+        //auto start = std::chrono::high_resolution_clock::now();
+        obj->m_scaleFactor = 3;
+        
+        /*obj->m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
+        obj->m_fb.renderToTexture(obj->m_scaleFactor);      //rendering the same image over and over
+        obj->OnUpdate(0);
         obj->OnRender();
         GLCall(glFinish());
         auto elapsed = std::chrono::high_resolution_clock::now() - start;
         obj->m_renderTime = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
         obj->m_Shader.SetUniform1i("u_renderToTexture", 0);
         obj->m_fb.renderToScreen();
+        obj->m_scaleFactor = 1;*/
     }
 }
 

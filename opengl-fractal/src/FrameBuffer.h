@@ -8,12 +8,12 @@ class FrameBuffer
 {
 private:
 	GLFWwindow* m_window;
-	unsigned int m_FrameBuffer;
-	unsigned int m_Texture;
+	unsigned int m_FrameBuffer[3];
+	unsigned int m_Texture[3];
 public:
 	FrameBuffer(GLFWwindow* window);
 	~FrameBuffer();
 
-	void renderToTexture();
+	void renderToTexture(int scaleFactor);
 	void renderToScreen();
 };
