@@ -52,7 +52,9 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_Exp(2.0f),
     m_renderJulia(false),
     m_renderTime(0),
-    m_scaleFactor(1)
+    m_scaleFactor(1),
+    m_maxIter(200),
+    m_maxIterMax(400)
     //m_view(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
 {
     m_layout.Push<float>(2);
@@ -99,6 +101,13 @@ void test::TestFractal::OnUpdate(float deltaTime)
     int x, y;
     glfwGetFramebufferSize(m_window, &x, &y);
 
+    if (m_maxIter <= m_maxIterMax)
+    {
+        m_Shader.SetUniform1i("ITER_MAX", m_maxIter);
+        m_maxIter *= 2;
+        if (m_scaleFactor == 0)
+            m_scaleFactor = 1;
+    }
     if (m_scaleFactor > 0)
     {
         m_Shader.SetUniform2f("u_FramebufferSize", (float)(x/m_scaleFactor), (float)(y/m_scaleFactor));
@@ -117,7 +126,6 @@ void test::TestFractal::OnUpdate(float deltaTime)
     }
     m_Shader.SetUniform2f("u_FramebufferSize", (float)x, (float)y);
     m_Shader.SetUniform2f("u_crossHairCoord", m_crosshair.x, m_crosshair.y);
-    
 }
 
 void test::TestFractal::OnRender()
@@ -144,6 +152,7 @@ void test::TestFractal::OnImGuiRender()
     //ImGui::SliderFloat3("Translation A", &m_translationA.x, 0.0f, 960.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
     //ImGui::SliderFloat("Zoom: ", &m_zoom, -4.0f, 4.0f);
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::SliderInt("Maxmimum iterations: ", &m_maxIterMax, 100, 3200);
     //ImGui::SliderFloat3("Scale: ", &m_scale[0], 0.0f, 10.0f);
     ImGui::Text("C real: %f C imag: %f", cx, cy);
     ImGui::Text("X offset: %f Y offset: %f", m_offset.x, m_offset.y);
@@ -208,7 +217,7 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
 
         //auto start = std::chrono::high_resolution_clock::now();
         obj->m_scaleFactor = 3;
-        
+        obj->m_maxIter = 50;
         /*obj->m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
         obj->m_fb.renderToTexture(obj->m_scaleFactor);      //rendering the same image over and over
         obj->OnUpdate(0);

@@ -20,7 +20,7 @@ void main()
 #version 310 es
 
 precision highp float;
-#define ITER_MAX 200
+//#define ITER_MAX 200
 #define XMUL 5.0f
 #define XSUBT 2.501953f
 //#define XSUBT 2.8125f
@@ -40,6 +40,7 @@ uniform vec2 u_FramebufferSize;
 uniform vec2 u_crossHairCoord;
 uniform vec2 u_offset;
 uniform vec2 u_cVals;
+uniform int ITER_MAX;
 uniform float u_zoom;
 uniform float u_Exp;
 uniform int u_renderToTexture;
