@@ -24,24 +24,57 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_window(window),
     m_Shader("res/shaders/Fractal.shader"),
     m_Renderer(),
-    m_positions{
+    /*m_positions{
         0.0f, 0.0f, 0.0f, 0.0f,
         1920.0f, 0.0f, 1.0f, 0.0f,
-        1920.0f, 720.0f, 1.0f, 1.0f,
-        0.0f, 720.0f, 0.0f, 1.0f
+        1920.0f, 1080.0f, 1.0f, 1.0f,
+        0.0f, 1080.0f, 0.0f, 1.0f
     },
     m_indices{
         0, 1, 2,
         0, 2, 3
+    },*/
+
+    m_positions{
+        0.0f, 0.0f, 0.0f, 0.0f, //0
+        960.0f, 0.0f, 0.5f, 0.0f,//1
+        960.0f, 540.0f, 0.5f, 0.5f,//2
+        0.0f, 540.0f, 0.0f, 0.5f,//3
+
+        1920.0f, 0.0f, 1.0f, 0.0f,//4
+        1920.0f, 540.0f, 1.0f, 0.5f,//5
+
+        1920.0f, 1080.0f, 1.0f, 1.0f,//6
+        960.0f, 1080.0f, 0.5f, 1.0f,//7
+
+        0.0f, 1080.0f, 0.0f, 1.0f//8
     },
+    
+    m_indices{
+        0, 1, 2,
+        0, 2, 3,
+
+        1, 4, 5,
+        1, 5, 2,
+
+        2, 5, 6,
+        2, 6, 7,
+
+        3, 2, 7,
+        3, 7, 8
+    },
+
+
     m_va(),
-    m_vb(m_positions, 4 * 4 * sizeof(float)),
+    m_vb(m_positions, 9 * 4 * sizeof(float)),
+    //m_vb(m_positions, 4 * 4 * sizeof(float)),
     m_layout(),
-    m_ib(m_indices, 6),
+    m_ib(m_indices, 24),
+    //m_ib(m_indices, 6),
     m_fb(window),
     //m_translationA(200, 200, 0),
     m_scale(1.0f, 1.0f, 1.0f),
-    m_proj(glm::ortho(0.0f, 1920.0f, 0.0f, 720.0f, -1.0f, 1.0f)),
+    m_proj(glm::ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f)),
     m_crosshair(720.5f, 450.5f),
     m_crosshairMandel(0.0f, 0.0f),
     //m_offset(XADD, -YADD),
@@ -216,8 +249,9 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
         obj->m_Shader.SetUniform1f("u_zoom", obj->m_zoom);
 
         //auto start = std::chrono::high_resolution_clock::now();
+        //This is where we set how many render passes we will do
         obj->m_scaleFactor = 3;
-        obj->m_maxIter = 50;
+        obj->m_maxIter = 100;
         /*obj->m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
         obj->m_fb.renderToTexture(obj->m_scaleFactor);      //rendering the same image over and over
         obj->OnUpdate(0);

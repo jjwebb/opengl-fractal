@@ -22,8 +22,8 @@ namespace test {
 		GLFWwindow* m_window;
 		Shader m_Shader;
 		Renderer m_Renderer;
-		float m_positions[16];
-		unsigned int m_indices[6];
+		float m_positions[36];
+		unsigned int m_indices[24];
 		VertexArray m_va;
 		VertexBuffer m_vb;
 		VertexBufferLayout m_layout;
