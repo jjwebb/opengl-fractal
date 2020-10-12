@@ -35,7 +35,6 @@ out vec4 color;
 
 in vec2 v_TexCoord;
 
-uniform vec4 u_Color;
 uniform vec2 u_FramebufferSize;
 uniform vec2 u_crossHairCoord;
 uniform vec2 u_offset;

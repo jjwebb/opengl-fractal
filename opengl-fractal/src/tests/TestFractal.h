@@ -20,7 +20,9 @@ namespace test {
 	private:
 		//Texture m_Texture;
 		GLFWwindow* m_window;
-		Shader m_Shader;
+		Shader m_Shaders[5];
+		int m_currentShader; //Should be value 1 though 4, for indexes of m_Shaders. 
+							 //Index 0 is the crosshair shader, and is always drawn. 
 		Renderer m_Renderer;
 		float m_positions[36];
 		unsigned int m_indices[24];
@@ -40,10 +42,13 @@ namespace test {
 		float m_zoomMandel;
 		float m_Exp;
 		bool m_renderJulia;
+		bool m_renderToTexture;
 		long long m_renderTime;
 		int m_scaleFactor; //For scaling window coordinates and dimensions to smaller textures
 		int m_maxIter;
 		int m_maxIterMax;
+		int m_windowWidth;
+		int m_windowHeight;
 		//void fractalWindow();
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
