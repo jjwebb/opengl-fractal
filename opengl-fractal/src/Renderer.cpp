@@ -26,6 +26,22 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
     shader.Bind();
     va.Bind();
     ib.Bind(); //va does this already (does it????)
-    //for (int i = 0; i < 2; i++)
-        GLCall(glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, nullptr));
+    for (int i = 0; i < 4; i++)
+    {
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(i * 6 * sizeof(unsigned int))));
+    }
+}
+
+void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, const bool& stop) const
+{
+    shader.Bind();
+    va.Bind();
+    ib.Bind(); //va does this already (does it????)
+    for (int i = 0; i < 4; i++)
+    {
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(i * 6 * sizeof(unsigned int))));
+        glfwPollEvents();
+        if (stop)
+            return;
+    }
 }

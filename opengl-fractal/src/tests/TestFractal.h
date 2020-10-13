@@ -49,6 +49,7 @@ namespace test {
 		int m_maxIterMax;
 		int m_windowWidth;
 		int m_windowHeight;
+		bool m_stop; //Stop rendering if a key is pressed
 		//void fractalWindow();
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);

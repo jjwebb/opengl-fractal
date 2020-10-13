@@ -22,11 +22,11 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     : //m_Texture("res/textures/peach.png"),
     //m_window(glfwCreateWindow(1440, 900, "Mandelbrot", NULL, NULL)),
     m_window(window),
-    m_Shaders{ "res/shaders/Crosshair.shader",  //[0] -- Crosshair shader
-               "res/shaders/Mandelbrot.shader", //[1] -- Mandelbrot only shader
-               "res/shaders/Multibrot.shader",  //[2] -- Multibrot only shader
-               "res/shaders/Julia.shader",      //[3] -- Julia set only shader
-               "res/shaders/Multijulia.shader" },//[4] -- Multi-julia only shader
+    m_Shaders{Shader("res/shaders/Crosshair.shader"),  //[0] -- Crosshair shader
+              Shader("res/shaders/Mandelbrot.shader"), //[1] -- Mandelbrot only shader
+              Shader("res/shaders/Multibrot.shader"),  //[2] -- Multibrot only shader
+              Shader("res/shaders/Julia.shader"),      //[3] -- Julia set only shader
+              Shader("res/shaders/Multijulia.shader")},//[4] -- Multi-julia only shader
     m_currentShader(1),
     m_Renderer(),
     /*m_positions{
@@ -95,7 +95,8 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_maxIter(200),
     m_maxIterMax(400),
     m_windowWidth(0),
-    m_windowHeight(0)
+    m_windowHeight(0),
+    m_stop(false)
     //m_view(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
 {
     m_layout.Push<float>(2);
@@ -188,8 +189,9 @@ void test::TestFractal::OnUpdate(float deltaTime)
 void test::TestFractal::OnRender()
 {
     m_Renderer.Clear();
+    m_stop = false;
     if(m_renderToTexture)
-        m_Renderer.Draw(m_va, m_ib, m_Shaders[m_currentShader]);
+        m_Renderer.Draw(m_va, m_ib, m_Shaders[m_currentShader], m_stop);
     else
         m_Renderer.Draw(m_va, m_ib, m_Shaders[0]);
 }
@@ -299,6 +301,8 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
     {
         void* data = glfwGetWindowUserPointer(window);
         TestFractal* obj = static_cast<TestFractal*>(data);
+
+        obj->m_stop = true;
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);

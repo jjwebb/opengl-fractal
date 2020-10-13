@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <GL/glew.h>
+#include<GLFW/glfw3.h>
 //#include <iostream>
 #include <assert.h>
 #include "VertexArray.h"
@@ -24,6 +25,7 @@ private:
 public:
     void Clear() const;
     void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+    void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, const bool& stop) const;
     //Renderer();
     //~Renderer();
 };
