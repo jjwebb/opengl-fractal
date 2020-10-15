@@ -44,6 +44,9 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(i * 6 * sizeof(unsigned int))));
         glfwPollEvents();
         if (stop)
+        {
+            std::cout << "Rendered " << i + 1 << " quads before returning" << std::endl;
             return;
+        }
     }
 }

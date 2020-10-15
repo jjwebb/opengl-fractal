@@ -183,6 +183,7 @@ void test::TestFractal::OnUpdate(float deltaTime)
         //m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
         m_fb.renderToTexture(m_scaleFactor);      //rendering the same image over and over
         OnRender();
+        if (m_stop) { OnUpdate(0); return; }
         GLCall(glFinish());
         m_scaleFactor--;
         auto elapsed = std::chrono::high_resolution_clock::now() - start;
@@ -669,48 +670,4 @@ void test::TestFractal::generateBuffers(float* buffer, unsigned int* indexes, in
         }
         std::cout << std::endl;
     }
-}
-
-int* test::TestFractal::generateIndBuffer(int* indexes, int rows, int cols, float screenWidth, float screenHeight)
-{
-    //rows++; cols++;
-    for (int r = 0; r < rows; r++)
-    {
-        for (int c = 0; c < cols; c++)
-        {
-                int indexPos = r * (cols + 1) + c;
-                int indexBufferPos = (r * cols + c) * 6;
-                indexes[indexBufferPos] = indexPos;
-                indexes[indexBufferPos + 1] = (r + 1) * (cols + 1) + c;
-                indexes[indexBufferPos + 2] = indexes[indexBufferPos + 1] + 1;
-                indexes[indexBufferPos + 3] = indexPos;
-                indexes[indexBufferPos + 4] = indexPos + 1;
-                indexes[indexBufferPos + 5] = indexes[indexBufferPos + 2];
-                    std::cout << indexBufferPos << "(" << indexes[indexBufferPos] << "," << indexes[indexBufferPos + 1] << "," << indexes[indexBufferPos + 2] << " , "
-                       << indexes[indexBufferPos + 3] << "," << indexes[indexBufferPos + 4] << "," << indexes[indexBufferPos + 5] << ") ";
-        }
-        std::cout << std::endl;
-    }
-    return indexes;
-}
-
-float* test::TestFractal::generateVertBuffer(float* buffer, int rows, int cols, float screenWidth, float screenHeight)
-{
-    rows++; cols++;
-    for (int r = 0; r < rows; r++)
-    {
-        for (int c = 0; c < cols; c++)
-        {
-            int indexPos = r * cols + c;
-            int bufferPos = indexPos * 4;
-            buffer[bufferPos] = (c / float(cols - 1)) * screenWidth;
-            buffer[bufferPos + 1] = (r / float(rows - 1)) * screenHeight;
-            buffer[bufferPos + 2] = c / float(cols - 1);
-            buffer[bufferPos + 3] = r / float(rows - 1);
-            std::cout << bufferPos << "(" << buffer[bufferPos] << ", " << buffer[bufferPos + 1] << ", "
-                << buffer[bufferPos + 2] << ", " << buffer[bufferPos + 3] << ") ";
-        }
-        std::cout << std::endl;
-    }
-    return buffer;
 }

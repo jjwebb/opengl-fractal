@@ -52,8 +52,6 @@ namespace test {
 		bool m_stop; //Stop rendering if a key is pressed
 		
 		void generateBuffers(float* buffer, unsigned int* indexes, int rows, int cols, float screenWidth, float screenHeight);
-		int* test::TestFractal::generateIndBuffer(int* indexes, int rows, int cols, float screenWidth, float screenHeight);
-		float* test::TestFractal::generateVertBuffer(float* buffer, int rows, int cols, float screenWidth, float screenHeight);
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 		static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
