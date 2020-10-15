@@ -24,8 +24,8 @@ namespace test {
 		int m_currentShader; //Should be value 1 though 4, for indexes of m_Shaders. 
 							 //Index 0 is the crosshair shader, and is always drawn. 
 		Renderer m_Renderer;
-		float m_positions[36];
-		unsigned int m_indices[24];
+		float m_positions[4 * 5 * 5];
+		unsigned int m_indices[6 * 4 * 4];
 		VertexArray m_va;
 		VertexBuffer m_vb;
 		VertexBufferLayout m_layout;
@@ -50,7 +50,10 @@ namespace test {
 		int m_windowWidth;
 		int m_windowHeight;
 		bool m_stop; //Stop rendering if a key is pressed
-		//void fractalWindow();
+		
+		void generateBuffers(float* buffer, unsigned int* indexes, int rows, int cols, float screenWidth, float screenHeight);
+		int* test::TestFractal::generateIndBuffer(int* indexes, int rows, int cols, float screenWidth, float screenHeight);
+		float* test::TestFractal::generateVertBuffer(float* buffer, int rows, int cols, float screenWidth, float screenHeight);
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 		static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);

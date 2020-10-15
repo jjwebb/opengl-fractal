@@ -1,5 +1,8 @@
 #include "FrameBuffer.h"
 
+FrameBuffer::FrameBuffer()
+{
+}
 FrameBuffer::FrameBuffer(GLFWwindow* window)
 	: m_window(window)
 {

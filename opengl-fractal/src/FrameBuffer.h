@@ -11,6 +11,7 @@ private:
 	unsigned int m_FrameBuffer[3];
 	unsigned int m_Texture[3];
 public:
+	FrameBuffer();
 	FrameBuffer(GLFWwindow* window);
 	~FrameBuffer();
 

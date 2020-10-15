@@ -39,8 +39,7 @@ test::TestFractal::TestFractal(GLFWwindow* window)
         0, 1, 2,
         0, 2, 3
     },*/
-
-    m_positions{
+    /*m_positions{
         0.0f, 0.0f, 0.0f, 0.0f, //0
         960.0f, 0.0f, 0.5f, 0.0f,//1
         960.0f, 540.0f, 0.5f, 0.5f,//2
@@ -67,16 +66,19 @@ test::TestFractal::TestFractal(GLFWwindow* window)
 
         3, 2, 7,
         3, 7, 8
-    },
-
-
+    },*/
+    m_positions(),
+    m_indices(),
     m_va(),
-    m_vb(m_positions, 9 * 4 * sizeof(float)),
+    m_vb(),
+    //m_vb(m_positions, 9 * 4 * sizeof(float)),
     //m_vb(m_positions, 4 * 4 * sizeof(float)),
     m_layout(),
-    m_ib(m_indices, 24),
+    m_ib(),
+    //m_ib(m_indices, 24),
     //m_ib(m_indices, 6),
     m_fb(window),
+    //m_fb(),
     //m_translationA(200, 200, 0),
     m_scale(1.0f, 1.0f, 1.0f),
     m_proj(glm::ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f)),
@@ -99,6 +101,13 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_stop(false)
     //m_view(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
 {
+    //float buf[4 * 5 * 5];
+    //int ind[6 * 4 * 4];
+
+    generateBuffers(m_positions, m_indices, 4, 4, 1920.0f, 1080.0f);
+    m_vb.init(m_positions, 5 * 5 * 4 * sizeof(float));
+    m_ib.init(m_indices, 6 * 4 * 4);
+    //m_fb = FrameBuffer(window);
     m_layout.Push<float>(2);
     m_layout.Push<float>(2);
     //m_layout.Push<float>(2);
@@ -627,4 +636,81 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
             }
         }
     }
+}
+
+void test::TestFractal::generateBuffers(float* buffer, unsigned int* indexes, int rows, int cols, float screenWidth, float screenHeight)
+{
+    rows++; cols++;
+    for (int r = 0; r < rows; r++)
+    {
+        for (int c = 0; c < cols; c++)
+        {
+            if (c < cols - 1 && r < rows - 1)
+            {
+                int indexPos = r * cols + c;
+                int indexBufferPos = (r * (cols-1) + c) * 6;
+                indexes[indexBufferPos] = indexPos;
+                indexes[indexBufferPos + 1] = (r + 1) * cols + c;
+                indexes[indexBufferPos + 2] = indexes[indexBufferPos + 1] + 1;
+                indexes[indexBufferPos + 3] = indexPos;
+                indexes[indexBufferPos + 4] = indexPos + 1;
+                indexes[indexBufferPos + 5] = indexes[indexBufferPos + 2];
+                //std::cout << indexBufferPos << "(" << indexes[indexBufferPos] << "," << indexes[indexBufferPos + 1] << "," << indexes[indexBufferPos + 2] << " , "
+                //   << indexes[indexBufferPos + 3] << "," << indexes[indexBufferPos + 4] << "," << indexes[indexBufferPos + 5] << ") ";
+            }
+            int indexPos = r * cols + c;
+            int bufferPos = indexPos * 4;
+            buffer[bufferPos] = (c / float(cols-1)) * screenWidth;
+            buffer[bufferPos + 1] = (r / float(rows-1)) * screenHeight;
+            buffer[bufferPos + 2] = c / float(cols-1);
+            buffer[bufferPos + 3] = r / float(rows-1);
+            std::cout << bufferPos << "(" << buffer[bufferPos] << ", " << buffer[bufferPos + 1] << ", "
+                << buffer[bufferPos + 2] << ", " << buffer[bufferPos + 3] << ") ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+int* test::TestFractal::generateIndBuffer(int* indexes, int rows, int cols, float screenWidth, float screenHeight)
+{
+    //rows++; cols++;
+    for (int r = 0; r < rows; r++)
+    {
+        for (int c = 0; c < cols; c++)
+        {
+                int indexPos = r * (cols + 1) + c;
+                int indexBufferPos = (r * cols + c) * 6;
+                indexes[indexBufferPos] = indexPos;
+                indexes[indexBufferPos + 1] = (r + 1) * (cols + 1) + c;
+                indexes[indexBufferPos + 2] = indexes[indexBufferPos + 1] + 1;
+                indexes[indexBufferPos + 3] = indexPos;
+                indexes[indexBufferPos + 4] = indexPos + 1;
+                indexes[indexBufferPos + 5] = indexes[indexBufferPos + 2];
+                    std::cout << indexBufferPos << "(" << indexes[indexBufferPos] << "," << indexes[indexBufferPos + 1] << "," << indexes[indexBufferPos + 2] << " , "
+                       << indexes[indexBufferPos + 3] << "," << indexes[indexBufferPos + 4] << "," << indexes[indexBufferPos + 5] << ") ";
+        }
+        std::cout << std::endl;
+    }
+    return indexes;
+}
+
+float* test::TestFractal::generateVertBuffer(float* buffer, int rows, int cols, float screenWidth, float screenHeight)
+{
+    rows++; cols++;
+    for (int r = 0; r < rows; r++)
+    {
+        for (int c = 0; c < cols; c++)
+        {
+            int indexPos = r * cols + c;
+            int bufferPos = indexPos * 4;
+            buffer[bufferPos] = (c / float(cols - 1)) * screenWidth;
+            buffer[bufferPos + 1] = (r / float(rows - 1)) * screenHeight;
+            buffer[bufferPos + 2] = c / float(cols - 1);
+            buffer[bufferPos + 3] = r / float(rows - 1);
+            std::cout << bufferPos << "(" << buffer[bufferPos] << ", " << buffer[bufferPos + 1] << ", "
+                << buffer[bufferPos + 2] << ", " << buffer[bufferPos + 3] << ") ";
+        }
+        std::cout << std::endl;
+    }
+    return buffer;
 }
