@@ -35,6 +35,12 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
 
 void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, const bool& stop) const
 {
+    glfwPollEvents();
+    if (stop)
+    {
+        std::cout << "Stopped before rendering!" << std::endl;
+        return;
+    }
     int quads = ib.GetCount() / 6;
     shader.Bind();
     va.Bind();
@@ -42,6 +48,7 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
     for (int i = 0; i < quads; i++)
     {
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(i * 6 * sizeof(unsigned int))));
+        GLCall(glFinish());
         glfwPollEvents();
         if (stop)
         {
