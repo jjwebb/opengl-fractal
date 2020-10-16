@@ -98,7 +98,8 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_maxIterMax(400),
     m_windowWidth(0),
     m_windowHeight(0),
-    m_stop(false)
+    m_stop(false),
+    m_imgChanged(false)
     //m_view(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
 {
     //float buf[4 * 5 * 5];
@@ -166,6 +167,7 @@ void test::TestFractal::OnUpdate(float deltaTime)
     int x, y;
     glfwGetFramebufferSize(m_window, &x, &y);
 
+    m_imgChanged = false;
     if (m_maxIter <= m_maxIterMax)
     {
         m_Shaders[m_currentShader].SetUniform1i("ITER_MAX", m_maxIter);
@@ -180,12 +182,24 @@ void test::TestFractal::OnUpdate(float deltaTime)
 
         auto start = std::chrono::high_resolution_clock::now();
         m_renderToTexture = 1;
-        //m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
-        m_fb.renderToTexture(m_scaleFactor);      //rendering the same image over and over
+        //Render a single frame of the fractal to a texture that will be sampled instead of
+        m_fb.renderToTexture(m_scaleFactor);//rendering the same image over and over
         OnRender();
-        if (m_stop) { OnUpdate(0); return; }
+        if (m_stop)//Render stops if a key is pressed mid-render
+        { 
+            if (m_imgChanged)
+            {
+                OnUpdate(0); 
+                return; 
+            }
+            else
+            {
+                m_fb.renderToTexture(m_scaleFactor + 1);
+            }
+        }
+        else
+            m_scaleFactor--;
         GLCall(glFinish());
-        m_scaleFactor--;
         auto elapsed = std::chrono::high_resolution_clock::now() - start;
         m_renderTime = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
         //m_Shader.SetUniform1i("u_renderToTexture", 0);
@@ -198,10 +212,9 @@ void test::TestFractal::OnUpdate(float deltaTime)
 
 void test::TestFractal::OnRender()
 {
-    m_Renderer.Clear();
     m_stop = false;
     if(m_renderToTexture)
-        m_Renderer.Draw(m_va, m_ib, m_Shaders[m_currentShader], m_stop);
+        m_Renderer.Draw(m_va, m_ib, m_Shaders[m_currentShader], m_stop, m_scaleFactor, m_maxIter);
     else
         m_Renderer.Draw(m_va, m_ib, m_Shaders[0]);
 }
@@ -327,6 +340,7 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
 
             if (key == GLFW_KEY_W && obj->m_renderJulia)
             {
+                obj->m_imgChanged = true;
                 //The crosshair could have moved with the arrow keys, we need to reset it if the last move wasn't with WASD
                 if (obj->m_crosshair.y == obj->m_crosshairMandel.y && obj->m_crosshair.x == obj->m_crosshairMandel.x)
                     obj->m_crosshair.y += 20;
@@ -365,6 +379,7 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
         case GLFW_KEY_DOWN:
             if (key == GLFW_KEY_S && obj->m_renderJulia)
             {
+                obj->m_imgChanged = true;
                 if (obj->m_crosshair.y == obj->m_crosshairMandel.y && obj->m_crosshair.x == obj->m_crosshairMandel.x)
                     obj->m_crosshair.y -= 20;
                 else
@@ -402,6 +417,7 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
         case GLFW_KEY_LEFT:
             if (key == GLFW_KEY_A && obj->m_renderJulia)
             {
+                obj->m_imgChanged = true;
                 if (obj->m_crosshair.y == obj->m_crosshairMandel.y && obj->m_crosshair.x == obj->m_crosshairMandel.x)
                     obj->m_crosshair.x -= 20;
                 else
@@ -438,6 +454,7 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
         case GLFW_KEY_RIGHT:
             if (key == GLFW_KEY_D && obj->m_renderJulia)
             {
+                obj->m_imgChanged = true;
                 if (obj->m_crosshair.y == obj->m_crosshairMandel.y && obj->m_crosshair.x == obj->m_crosshairMandel.x)
                     obj->m_crosshair.x += 20;
                 else
@@ -474,9 +491,11 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
 
         //BACKSPACE zooms out, ENTER zooms in
         case GLFW_KEY_BACKSPACE:
+            obj->m_imgChanged = true;
             mouse_button_callback(window, GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS, 0);
             break;
         case GLFW_KEY_ENTER:
+            obj->m_imgChanged = true;
             mouse_button_callback(window, GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS, 0);
             break;
 
@@ -485,6 +504,7 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
         case GLFW_KEY_J:
         case GLFW_KEY_H:
         {
+            obj->m_imgChanged = true;
             if (!obj->m_renderJulia)
             {
                 //If Exponent == 2, render Julia set. Otherwise, render multijulia
@@ -544,6 +564,7 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
 
         //Pressing N raises the exponent in Z^n + C by 1, P lowers it by 1
         case GLFW_KEY_N:
+            obj->m_imgChanged = true;
             obj->m_currentShader = obj->m_renderJulia ? 4 : 2;
             obj->m_Shaders[obj->m_currentShader].SetUniform1f("u_Exp", obj->m_Exp + 1.0f);
             obj->m_Exp++;
@@ -554,6 +575,7 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
         case GLFW_KEY_P:
             if (obj->m_Exp > 2.0f)
             {
+                obj->m_imgChanged = true;
                 obj->m_Exp--;
                 if(static_cast<int>(obj->m_Exp) == 2)
                     obj->m_currentShader = obj->m_renderJulia ? 3 : 1;

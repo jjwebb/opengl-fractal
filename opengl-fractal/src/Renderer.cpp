@@ -15,6 +15,17 @@ bool GLLogCall(const char* function, const char* file, int line)
     return true;
 }
 
+Renderer::Renderer()
+{
+    m_iLast = 0;
+    m_maxIterLast = 0;
+    m_scaleLast = 0;
+}
+
+Renderer::~Renderer()
+{
+}
+
 void Renderer::Clear() const
 {
     GLCall(glClear(GL_COLOR_BUFFER_BIT));
@@ -23,6 +34,7 @@ void Renderer::Clear() const
 
 void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
 {
+    Clear();
     int quads = ib.GetCount() / 6;
     shader.Bind();
     va.Bind();
@@ -33,7 +45,7 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
     }
 }
 
-void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, const bool& stop) const
+void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, const bool& stop, const int& scale, const int& maxIter) const
 {
     glfwPollEvents();
     if (stop)
@@ -45,15 +57,27 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
     shader.Bind();
     va.Bind();
     ib.Bind(); //va does this already (does it????)
-    for (int i = 0; i < quads; i++)
+    if (scale != m_scaleLast || maxIter != m_maxIterLast)
+    {
+        Clear();
+        m_iLast = 0;
+    }
+    else
+        std::cout << "Resuming at quad index " << m_iLast << std::endl;
+    for (int i = m_iLast; i < quads; i++)
     {
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(i * 6 * sizeof(unsigned int))));
         GLCall(glFinish());
         glfwPollEvents();
         if (stop)
         {
+            m_iLast = i;
+            m_scaleLast = scale;
+            m_maxIterLast = maxIter;
             std::cout << "Rendered " << i + 1 << " quads before returning" << std::endl;
             return;
         }
     }
+    m_scaleLast = scale;
+    m_maxIterLast = maxIter;
 }

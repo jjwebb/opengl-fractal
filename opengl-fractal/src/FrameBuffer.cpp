@@ -38,6 +38,10 @@ FrameBuffer::~FrameBuffer()
 
 void FrameBuffer::renderToTexture(int scaleFactor)
 {
+	if (scaleFactor > 3)
+		scaleFactor = 3;
+	else if (scaleFactor < 1)
+		scaleFactor = 1;
 	int width, height;
 	glfwGetFramebufferSize(m_window, &width, &height);
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer[scaleFactor-1]));

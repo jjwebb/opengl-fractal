@@ -50,6 +50,7 @@ namespace test {
 		int m_windowWidth;
 		int m_windowHeight;
 		bool m_stop; //Stop rendering if a key is pressed
+		bool m_imgChanged;//If the keypress registered changed the image, stop rendering
 		
 		void generateBuffers(float* buffer, unsigned int* indexes, int rows, int cols, float screenWidth, float screenHeight);
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
