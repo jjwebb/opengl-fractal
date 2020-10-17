@@ -45,7 +45,8 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
     }
 }
 
-void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, const bool& stop, const int& scale, const int& maxIter) const
+void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, 
+const bool& stop, const int& scale, const int& maxIter, const bool& changed) const
 {
     glfwPollEvents();
     if (stop)
@@ -69,9 +70,11 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(i * 6 * sizeof(unsigned int))));
         GLCall(glFinish());
         glfwPollEvents();
-        if (stop)
+        if (stop && (scale != 3 || changed))
         {
-            m_iLast = i;
+            m_iLast = !changed ? i : 0;
+            if(scale == 3 && changed)
+                Clear();
             m_scaleLast = scale;
             m_maxIterLast = maxIter;
             std::cout << "Rendered " << i + 1 << " quads before returning" << std::endl;

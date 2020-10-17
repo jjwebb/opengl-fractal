@@ -29,5 +29,6 @@ public:
     ~Renderer();
     void Clear() const;
     void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
-    void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, const bool& stop, const int& scale, const int& maxIter) const;
+    void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, 
+    const bool& stop, const int& scale, const int& maxIter, const bool& changed) const;
 };

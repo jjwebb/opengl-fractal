@@ -214,7 +214,7 @@ void test::TestFractal::OnRender()
 {
     m_stop = false;
     if(m_renderToTexture)
-        m_Renderer.Draw(m_va, m_ib, m_Shaders[m_currentShader], m_stop, m_scaleFactor, m_maxIter);
+        m_Renderer.Draw(m_va, m_ib, m_Shaders[m_currentShader], m_stop, m_scaleFactor, m_maxIter, m_imgChanged);
     else
         m_Renderer.Draw(m_va, m_ib, m_Shaders[0]);
 }
