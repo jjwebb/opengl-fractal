@@ -64,7 +64,8 @@ const bool& stop, const int& scale, const int& maxIter, const bool& changed) con
         m_iLast = 0;
     }
     else
-        std::cout << "Resuming at quad index " << m_iLast << std::endl;
+        std::cout << "Resuming at quad index " << 
+        m_iLast << " Scale " << scale << " (ScaleLast " << m_scaleLast << ") " << std::endl;
     for (int i = m_iLast; i < quads; i++)
     {
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(i * 6 * sizeof(unsigned int))));
@@ -72,12 +73,13 @@ const bool& stop, const int& scale, const int& maxIter, const bool& changed) con
         glfwPollEvents();
         if (stop && (scale != 3 || changed))
         {
+            std::cout << "Rendered " << (i + 1) - m_iLast << " quads before returning" <<
+             " Scale " << scale << " (ScaleLast " << m_scaleLast << ") " << std::endl;
             m_iLast = !changed ? i : 0;
             if(scale == 3 && changed)
                 Clear();
             m_scaleLast = scale;
             m_maxIterLast = maxIter;
-            std::cout << "Rendered " << i + 1 << " quads before returning" << std::endl;
             return;
         }
     }
