@@ -105,9 +105,9 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     //float buf[4 * 5 * 5];
     //int ind[6 * 4 * 4];
 
-    generateBuffers(m_positions, m_indices, 4, 4, 1920.0f, 1080.0f);
-    m_vb.init(m_positions, 5 * 5 * 4 * sizeof(float));
-    m_ib.init(m_indices, 6 * 4 * 4);
+    generateBuffers(m_positions, m_indices, 8, 8, 1920.0f, 1080.0f);
+    m_vb.init(m_positions, 9 * 9 * 4 * sizeof(float));
+    m_ib.init(m_indices, 6 * 8 * 8);
     //m_fb = FrameBuffer(window);
     m_layout.Push<float>(2);
     m_layout.Push<float>(2);

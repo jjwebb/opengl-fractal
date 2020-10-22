@@ -24,8 +24,8 @@ namespace test {
 		int m_currentShader; //Should be value 1 though 4, for indexes of m_Shaders. 
 							 //Index 0 is the crosshair shader, and is always drawn. 
 		Renderer m_Renderer;
-		float m_positions[4 * 5 * 5];
-		unsigned int m_indices[6 * 4 * 4];
+		float m_positions[4 * 9 * 9];
+		unsigned int m_indices[6 * 8 * 8];
 		VertexArray m_va;
 		VertexBuffer m_vb;
 		VertexBufferLayout m_layout;
