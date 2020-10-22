@@ -168,9 +168,10 @@ void test::TestFractal::OnUpdate(float deltaTime)
     glfwGetFramebufferSize(m_window, &x, &y);
 
     m_imgChanged = false;
-    if (m_maxIter <= m_maxIterMax)
+    if (m_maxIter <= m_maxIterMax) //check if this was already set
     {
         m_Shaders[m_currentShader].SetUniform1i("ITER_MAX", m_maxIter);
+        //m_maxIterLast = m_maxIter;
         m_maxIter *= 2;
         if (m_scaleFactor == 1)
             m_scaleFactor = 2;
@@ -199,7 +200,7 @@ void test::TestFractal::OnUpdate(float deltaTime)
         }
         else
             m_scaleFactor--;
-        GLCall(glFinish());
+        //GLCall(glFinish());
         auto elapsed = std::chrono::high_resolution_clock::now() - start;
         m_renderTime = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
         //m_Shader.SetUniform1i("u_renderToTexture", 0);
@@ -304,6 +305,7 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
         //auto start = std::chrono::high_resolution_clock::now();
         //This is where we set how many render passes we will do
         obj->m_scaleFactor = 3;
+        //obj->m_maxIterLast = obj->m_maxIter;
         obj->m_maxIter = 200;
         /*obj->m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
         obj->m_fb.renderToTexture(obj->m_scaleFactor);      //rendering the same image over and over

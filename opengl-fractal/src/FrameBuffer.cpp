@@ -43,19 +43,19 @@ void FrameBuffer::renderToTexture(int scaleFactor)
 	else if (scaleFactor < 1)
 		scaleFactor = 1;
 	int width, height;
-	glfwGetFramebufferSize(m_window, &width, &height);
+	//glfwGetFramebufferSize(m_window, &width, &height);
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer[scaleFactor-1]));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture[scaleFactor-1]));
 	//GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture));
 	
-	GLCall(glViewport(0, 0, width, height));
+	//GLCall(glViewport(0, 0, width, height));
 }
 
 void FrameBuffer::renderToScreen()
 {
 	int width, height;
-	glfwGetFramebufferSize(m_window, &width, &height);
+	//glfwGetFramebufferSize(m_window, &width, &height);
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	//GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture));
-	GLCall(glViewport(0, 0, width, height));
+	//GLCall(glViewport(0, 0, width, height));
 }
