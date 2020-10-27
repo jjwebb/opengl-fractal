@@ -105,9 +105,9 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     //float buf[4 * 5 * 5];
     //int ind[6 * 4 * 4];
 
-    generateBuffers(m_positions, m_indices, 8, 8, 1920.0f, 1080.0f);
-    m_vb.init(m_positions, 9 * 9 * 4 * sizeof(float));
-    m_ib.init(m_indices, 6 * 8 * 8);
+    generateBuffers(m_positions, m_indices, GRIDRC, GRIDRC, 1920.0f, 1080.0f);
+    m_vb.init(m_positions, (GRIDRC + 1) * (GRIDRC + 1) * 4 * sizeof(float));
+    m_ib.init(m_indices, 6 * GRIDRC * GRIDRC);
     //m_fb = FrameBuffer(window);
     m_layout.Push<float>(2);
     m_layout.Push<float>(2);
@@ -200,7 +200,7 @@ void test::TestFractal::OnUpdate(float deltaTime)
         }
         else
             m_scaleFactor--;
-        //GLCall(glFinish());
+        GLCall(glFinish());
         auto elapsed = std::chrono::high_resolution_clock::now() - start;
         m_renderTime = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
         //m_Shader.SetUniform1i("u_renderToTexture", 0);

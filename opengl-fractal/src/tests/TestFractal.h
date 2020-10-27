@@ -7,6 +7,8 @@
 #include "VertexBufferLayout.h"
 #include "FrameBuffer.h"
 
+#define GRIDRC 4 //grid # of rows and columns
+
 namespace test {
 	class TestFractal : public Test
 	{
@@ -24,8 +26,8 @@ namespace test {
 		int m_currentShader; //Should be value 1 though 4, for indexes of m_Shaders. 
 							 //Index 0 is the crosshair shader, and is always drawn. 
 		Renderer m_Renderer;
-		float m_positions[4 * 9 * 9];
-		unsigned int m_indices[6 * 8 * 8];
+		float m_positions[4 * (GRIDRC + 1) * (GRIDRC + 1)];
+		unsigned int m_indices[6 * GRIDRC * GRIDRC];
 		VertexArray m_va;
 		VertexBuffer m_vb;
 		VertexBufferLayout m_layout;

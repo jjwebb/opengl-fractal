@@ -26,7 +26,8 @@ FrameBuffer::FrameBuffer(GLFWwindow* window)
 		GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Texture[i], 0));
 		GLCall(glCheckFramebufferStatus(GL_FRAMEBUFFER));
 	}
-		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));//switch back to rendering to screen
+	GLCall(glViewport(0, 0, width, height));
+	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));//switch back to rendering to screen
 }
 
 FrameBuffer::~FrameBuffer()

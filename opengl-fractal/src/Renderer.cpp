@@ -69,7 +69,7 @@ const bool& stop, const int& scale, const int& maxIter, const bool& changed) con
     for (int i = m_iLast; i < quads; i++)
     {
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(i * 6 * sizeof(unsigned int))));
-        //GLCall(glFinish());
+        GLCall(glFinish());
         glfwPollEvents();
         if (stop && (scale != 3 || changed))
         {
