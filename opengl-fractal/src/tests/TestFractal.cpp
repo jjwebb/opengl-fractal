@@ -289,6 +289,9 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
             obj->m_crosshair.y = y / 2 + 0.5f;
             obj->m_crosshairMandel.x = obj->m_crosshair.x;
             obj->m_crosshairMandel.y = obj->m_crosshair.y;
+            obj->m_scaleFactor = 2;
+            obj->m_maxIter = obj->m_maxIterMax;
+            //obj->m_maxIter = 200;
         }
         else if (button == GLFW_MOUSE_BUTTON_RIGHT)
         {
@@ -297,16 +300,23 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
             obj->m_crosshair.y = y / 2 + 0.5f;
             obj->m_crosshairMandel.x = obj->m_crosshair.x;
             obj->m_crosshairMandel.y = obj->m_crosshair.y;
+            obj->m_scaleFactor = 2;
+            obj->m_maxIter = obj->m_maxIterMax;
+            //obj->m_maxIter = 200;
         }
-
+        else
+        {
+            obj->m_scaleFactor = 3;
+            obj->m_maxIter = 100;
+        }
         obj->m_Shaders[obj->m_currentShader].SetUniform2f("u_offset", obj->m_offset.x, obj->m_offset.y);
         obj->m_Shaders[obj->m_currentShader].SetUniform1f("u_zoom", obj->m_zoom);
 
         //auto start = std::chrono::high_resolution_clock::now();
         //This is where we set how many render passes we will do
-        obj->m_scaleFactor = 3;
+        //obj->m_scaleFactor = 3;
         //obj->m_maxIterLast = obj->m_maxIter;
-        obj->m_maxIter = 200;
+        
         /*obj->m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
         obj->m_fb.renderToTexture(obj->m_scaleFactor);      //rendering the same image over and over
         obj->OnUpdate(0);

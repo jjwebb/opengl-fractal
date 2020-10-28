@@ -56,6 +56,6 @@ void main()
 	}
 
 	float iterf = float(iter);
-	color = vec4(0.0f, 0.0f, 1.0f - iterf / float(ITER_MAX), 1.0f);
+	color = vec4(0.0f, (1.0f - iterf / float(ITER_MAX)), 0.0f, 1.0f);
 
 };

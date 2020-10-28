@@ -21,40 +21,60 @@ GPIO.setup(sw2, GPIO.IN)
 
 #counter = 0
 clkLastState = GPIO.input(clk)
-device = uinput.Device([uinput.KEY_A, uinput.KEY_D, uinput.KEY_W, uinput.KEY_S, uinput.KEY_J, uinput.KEY_ENTER, uinput.KEY_BACKSPACE])
+device = uinput.Device([uinput.KEY_A, uinput.KEY_D, uinput.KEY_W, uinput.KEY_S, uinput.KEY_J, uinput.KEY_H, uinput.KEY_ENTER, uinput.KEY_BACKSPACE])
 clkState = dtState = clk2State = dt2State = 0
 time1 = time2 = 0
 pressComplete = True
 lastClk = 0
 
 def sw_callback(channel):
+    swState = GPIO.input(sw)
+    global time1, time2, pressComplete
+    if swState:
+        time2 = time.time()
+        time3 = time2 - time1
+        #print("Rising! ", time1, time2, time3)
+        if time3 >= .3:
+            #print("H")
+            pressComplete = True
+            time1 = time2
+            device.emit_click(uinput.KEY_H)
+        elif time3 >= .05:
+            #print("J")
+            pressComplete = True
+            time1 = time2
+            device.emit_click(uinput.KEY_J)
+    else: #voltage falls on switch press
+        time0 = time.time()
+        if time0 - time1 > .1 and pressComplete:
+            time1 = time0
+            pressComplete = False
+            print("Set!")
+        #device.emit_click(uinput.KEY_J)
+
+def sw2_callback(channel):
     sw2State = GPIO.input(sw2)
     global time1, time2, pressComplete
-    if channel == sw:
-        device.emit_click(uinput.KEY_J)
-    elif channel == sw2:
-        if sw2State:
-            time2 = time.time()
-            time3 = time2 - time1
-            #print("Rising! ", time1, time2, time3)
-            if time3 >= .3:
-                print("BACKSPACE")
-                pressComplete = True
-                time1 = time2
-                device.emit_click(uinput.KEY_BACKSPACE)
-            elif time3 >= .05:
-                print("ENTER")
-                pressComplete = True
-                time1 = time2
-                device.emit_click(uinput.KEY_ENTER)
-        else: #voltage falls on switch press
-            time0 = time.time()
-            if time0 - time1 > .1 and pressComplete:
-                time1 = time0
-                pressComplete = False
-                print("Set!")
-            #print("Falling! ", time1, time2)
-    #print("Switch pressed!", channel)
+    if sw2State:
+        time2 = time.time()
+        time3 = time2 - time1
+        #print("Rising! ", time1, time2, time3)
+        if time3 >= .3:
+            print("BACKSPACE")
+            pressComplete = True
+            time1 = time2
+            device.emit_click(uinput.KEY_BACKSPACE)
+        elif time3 >= .05:
+            print("ENTER")
+            pressComplete = True
+            time1 = time2
+            device.emit_click(uinput.KEY_ENTER)
+    else: #voltage falls on switch press
+        time0 = time.time()
+        if time0 - time1 > .1 and pressComplete:
+            time1 = time0
+            pressComplete = False
+            print("Set!")
 
 def rotary_callback(channel):
     global clkState, dtState
@@ -89,8 +109,8 @@ GPIO.add_event_detect(clk, GPIO.BOTH, callback=rotary_callback)
 GPIO.add_event_detect(dt, GPIO.BOTH, callback=rotary_callback)
 GPIO.add_event_detect(clk2, GPIO.BOTH, callback=rotary_callback2)
 GPIO.add_event_detect(dt2, GPIO.BOTH, callback=rotary_callback2)
-GPIO.add_event_detect(sw, GPIO.BOTH, callback=sw_callback, bouncetime=300)
-GPIO.add_event_detect(sw2, GPIO.BOTH, callback=sw_callback)
+GPIO.add_event_detect(sw, GPIO.BOTH, callback=sw_callback)
+GPIO.add_event_detect(sw2, GPIO.BOTH, callback=sw2_callback)
 #input("Enter anything\n")
 #GPIO.cleanup()
 try:

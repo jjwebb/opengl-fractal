@@ -16,7 +16,7 @@ void main()
 #version 310 es
 
 precision highp float;
-//#define ITER_MAX 200
+//#define ITER_MAX 40
 #define XMUL 5.0f
 #define XSUBT 2.501953f
 //#define XSUBT 2.8125f

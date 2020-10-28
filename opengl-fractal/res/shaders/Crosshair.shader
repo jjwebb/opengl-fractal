@@ -33,12 +33,12 @@ void main()
 {
 	if (gl_FragCoord.x == (u_FramebufferSize.x / 2.0f) + 0.5f && gl_FragCoord.y == (u_FramebufferSize.y / 2.0f) + 0.5f)
 	{
-		color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		color = vec4(0.75f, 1.0f, 0.75f, 1.0f);
 		return;
 	}
 	else if (gl_FragCoord.x == u_crossHairCoord.x || gl_FragCoord.y == u_crossHairCoord.y)
 	{
-		color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		color = vec4(0.5f, 1.0f, 0.5f, 1.0f);
 		return;
 	}
 	else
