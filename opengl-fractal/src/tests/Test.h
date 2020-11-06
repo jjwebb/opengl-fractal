@@ -18,6 +18,7 @@ namespace test {
 		virtual void OnUpdate(float deltaTime) {}
 		virtual void OnRender() {}
 		virtual void OnImGuiRender() {}
+		virtual inline bool showGUI() const { return true; }
 	};
 
 	class TestMenu : public Test

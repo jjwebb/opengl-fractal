@@ -12,10 +12,10 @@
 Shader::Shader(const std::string& filepath)
 	: m_FilePath(filepath), m_RendererID(0)
 {
-    std::cout<<"Shader initializing.."<<std::endl;
+    //std::cout<<"Shader initializing.."<<std::endl;
     ShaderProgramSource source = ParseShader(filepath);
     m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
-    std::cout<<"Shader initialized"<<std::endl;
+    //std::cout<<"Shader initialized"<<std::endl;
 }
 
 Shader::~Shader()

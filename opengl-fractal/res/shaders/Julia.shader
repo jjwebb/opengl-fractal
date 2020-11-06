@@ -18,12 +18,13 @@ void main()
 precision highp float;
 //#define ITER_MAX 40
 #define XMUL 5.0f
-#define XSUBT 2.501953f
+//#define XSUBT 2.501953f
 //#define XSUBT 2.8125f
 #define YMUL 2.8125f
-#define YSUBT 1.408203f
+//#define YSUBT 1.408203f
 //#define YSUBT 1.40625f
-
+#define XSUBT 2.501302f
+#define YSUBT 1.407552f
 //#define XADD 0.310547f
 //#define YADD -0.001953f
 

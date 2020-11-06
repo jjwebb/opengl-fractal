@@ -26,7 +26,6 @@
 #include "tests/TestTexture.h"
 #include "tests/TestFractal.h"
 
-void cursorCallback(GLFWwindow* window, double xpos, double ypos);
 int main(void)
 {
     GLFWwindow* window;
@@ -60,8 +59,6 @@ int main(void)
 
     glfwSwapInterval(0);
 
-    glfwSetCursorPosCallback(window, cursorCallback);
-
     if (glewInit() != GLEW_OK)
         std::cout << "glewInit error!";
 
@@ -80,19 +77,24 @@ int main(void)
         char* str = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
         std::cout<<"Version: "<<str<<std::endl;
         ImGui_ImplOpenGL3_Init("#version 300 es");
+        ImGuiIO& io = ImGui::GetIO();
+        ImFont* font = io.Fonts->AddFontFromFileTTF("res/fonts/courbd.ttf", 18.0f);
+        IM_ASSERT(font != 0);
 
         //test::TestClearColor testClearColor;
         //test::TestTexture testTexture;
         //test::Test* test = &testClearColor;
         //test = &testTexture;
 
-        test::Test* currentTest = nullptr;
+        /*test::Test* currentTest = nullptr;
         test::TestMenu* testMenu = new test::TestMenu(currentTest);
         currentTest = testMenu;
 
         testMenu->RegisterTest<test::TestClearColor>("Clear Color");
         testMenu->RegisterTest<test::TestTexture>("Texture");
-        testMenu->RegisterTest<test::TestFractal>("Fractal", window);
+        testMenu->RegisterTest<test::TestFractal>("Fractal", window);*/
+
+        test::TestFractal fractal(window);
 
         double xpos, ypos;
 
@@ -102,46 +104,40 @@ int main(void)
 
         while (!glfwWindowShouldClose(window))
         {
-            glfwGetCursorPos(window, &xpos, &ypos);
+            //glfwGetCursorPos(window, &xpos, &ypos);
             //GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-            GLCall(glClear(GL_COLOR_BUFFER_BIT));
+            //GLCall(glClear(GL_COLOR_BUFFER_BIT));
             //renderer.Clear();
-
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-
-            /*if (ImGui::Button("Test Color"))
-                test = &testClearColor;
-            else if (ImGui::Button("Test Textures"))
-                test = &testTexture;*/
-
-            if (currentTest)
+            while (!fractal.doneRendering())
             {
-                currentTest->OnUpdate(0.0f);
-                currentTest->OnRender();
-                ImGui::Begin("Test");
-                ImGui::Text("X pos: %f Y pos: %f", xpos, y - ypos);
-                if (currentTest != testMenu && ImGui::Button("<-"))
+                if (fractal.showGUI())
                 {
-                    delete currentTest;
-                    currentTest = testMenu;
+                    ImGui_ImplOpenGL3_NewFrame();
+                    ImGui_ImplGlfw_NewFrame();
+                    ImGui::NewFrame();
+
+                    fractal.OnUpdate(0.0f);
+                    fractal.OnRender();
+
+                    ImGui::Begin("Mandelbrot", 0, ImGuiWindowFlags_NoTitleBar
+                        | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
+
+                    fractal.OnImGuiRender();
+
+                    ImGui::End();
+                    ImGui::Render();
+                    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
                 }
-                currentTest->OnImGuiRender();
-                ImGui::End();
+                else
+                {
+                    fractal.OnUpdate(0.0f);
+                    fractal.OnRender();
+                }
+                glfwSwapBuffers(window);
             }
-
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-            glfwSwapBuffers(window);
-
             /* Poll for and process events */
-            glfwPollEvents();
+            glfwWaitEvents();
         }
-        if (currentTest != testMenu)
-            delete testMenu;
-        delete currentTest;
         //GLCall(glDeleteProgram(shader));
     }
 
@@ -151,9 +147,4 @@ int main(void)
 
     glfwTerminate();
     return 0;
-}
-
-void cursorCallback(GLFWwindow* window, double xpos, double ypos)
-{
-    //std::cout << "X: " << xpos << " Y: " << ypos << std::endl;
 }

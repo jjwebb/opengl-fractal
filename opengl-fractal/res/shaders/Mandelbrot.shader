@@ -18,10 +18,10 @@ void main()
 precision highp float;
 //#define ITER_MAX 200
 #define XMUL 5.0f
-#define XSUBT 2.501953f
-//#define XSUBT 2.8125f
 #define YMUL 2.8125f
-#define YSUBT 1.408203f
+//#define XSUBT 2.8125f
+#define XSUBT 2.501302f
+#define YSUBT 1.407552f
 //#define YSUBT 1.40625f
 
 //#define XADD 0.310547f
@@ -56,6 +56,6 @@ void main()
 	}
 
 	float iterf = float(iter);
-	color = vec4(0.0f, (1.0f - iterf / float(ITER_MAX)), 0.0f, 1.0f);
+	color = vec4(0.0f, 0.0f, (1.0f - iterf / float(ITER_MAX)), 1.0f);
 
 };
