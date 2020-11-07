@@ -28,5 +28,3 @@ find_package(glm REQUIRED PATHS ${PROJECT_SOURCE_DIR}/opengl-fractal/src/vendor/
 #include_directories(${GLEW_INCLUDE_DIRS})
 
 add_subdirectory(opengl-fractal/src)
-
-

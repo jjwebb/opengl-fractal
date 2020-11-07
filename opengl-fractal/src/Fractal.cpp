@@ -1,5 +1,6 @@
 #include<iomanip>
-#include "TestFractal.h"
+#include<iostream>
+#include "Fractal.h"
 
 #include "glm/gtc/matrix_transform.hpp"
 #include "imgui/imgui.h"
@@ -7,20 +8,20 @@
 #include "imgui/imgui_impl_opengl3.h"
 
 #define XMUL 5.0f
+#define YMUL 2.8125f
 //#define XSUBT 2.8125f
 //With a X/Y ratio of 5.0/2.8125 (16:9) the center of the screen is at
 //C coords (-.310547, .001953). We have to add this into our equation for 
 //the zoom to scale properly
 //#define XSUBT 2.501953f
 #define XSUBT 2.501302f
-#define YMUL 2.8125f
+#define YSUBT 1.407552f
 //#define YSUBT 1.40625f
 //#define YSUBT 1.408203f
-#define YSUBT 1.407552f
 //#define XADD 0.310547f
 //#define YADD -0.001953f
 
-test::TestFractal::TestFractal(GLFWwindow* window)
+Fractal::Fractal(GLFWwindow* window)
     : 
     m_window(window),
     m_Shaders{Shader("res/shaders/Crosshair.shader"),  //[0] -- Crosshair shader
@@ -39,7 +40,7 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     m_fb(window),
     m_scale(1.0f, 1.0f, 1.0f),
     m_proj(glm::ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f)),
-    m_crosshair(720.5f, 450.5f),
+    m_crosshair(0.0f, 0.0f),
     m_crosshairMandel(0.0f, 0.0f),
     m_offset(0.0f, 0.0f),
     m_offsetMandel(0.0f, 0.0f),
@@ -99,7 +100,7 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     //m_Shader.SetUniform1i("u_Texture", 0);
     //m_Shader.SetUniform1i("u_julia", m_renderJulia);
 
-    OnUpdate(0.0f);
+    OnUpdate();
     //m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
     //m_fb.renderToTexture(m_scaleFactor);           //rendering the same image over and over
     //OnRender();
@@ -108,14 +109,14 @@ test::TestFractal::TestFractal(GLFWwindow* window)
     OnRender();
 }
 
-test::TestFractal::~TestFractal()
+Fractal::~Fractal()
 {
     glfwSetWindowUserPointer(m_window, NULL);
     glfwSetMouseButtonCallback(m_window, NULL);
     glfwSetKeyCallback(m_window, NULL);
 }
 
-void test::TestFractal::OnUpdate(float deltaTime)
+void Fractal::OnUpdate()
 {
     m_imgChanged = false;
     if (m_maxIter <= m_maxIterMax) //check if this was already set
@@ -140,7 +141,7 @@ void test::TestFractal::OnUpdate(float deltaTime)
         { 
             if (m_imgChanged)
             {
-                OnUpdate(0); 
+                OnUpdate(); 
                 return; 
             }
             else
@@ -163,7 +164,7 @@ void test::TestFractal::OnUpdate(float deltaTime)
         m_doneRendering = true;
 }
 
-void test::TestFractal::OnRender()
+void Fractal::OnRender()
 {
     m_stop = false;
     if(m_renderToTexture)
@@ -172,9 +173,10 @@ void test::TestFractal::OnRender()
         m_Renderer.Draw(m_va, m_ib, m_Shaders[0]);
 }
 
-void test::TestFractal::OnImGuiRender()
+void Fractal::OnImGuiRender()
 {    
-    //ImGui::Text("Avg %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    //ImGui::Text("f(Z) = Z^%i + C", int(m_Exp));
+    ImGui::Text("Avg %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     //ImGui::SliderInt("Max iterations: ", &m_maxIterMax, 100, 3200);
     
     if (m_renderJulia)
@@ -191,8 +193,8 @@ void test::TestFractal::OnImGuiRender()
 
         char chC = cy >= 0.0f ? '+' : '-';
         char chZ = zy >= 0.0f ? '+' : '-';
-        ImGui::Text("C = %f %c %fi", cx, chC, abs(cy));
-        ImGui::Text("Z = %f %c %fi", zx, chZ, abs(zy));
+        ImGui::Text("C = %f %c %fi", cx, chC, std::abs(cy));
+        ImGui::Text("Z = %f %c %fi", zx, chZ, std::abs(zy));
     }
     else
     {
@@ -202,7 +204,7 @@ void test::TestFractal::OnImGuiRender()
             * m_zoom + m_offset.y;
 
         char chC = cy >= 0.0f ? '+' : '-';
-        ImGui::Text("C = %f %c %fi", cx, chC, abs(cy));
+        ImGui::Text("C = %f %c %fi", cx, chC, std::abs(cy));
     }
     //ImGui::Text("X offset: %f Y offset: %f", m_offset.x, m_offset.y);
     //ImGui::Text("X offset add: %f Y offset add: %f", ox, oy);
@@ -220,17 +222,12 @@ void test::TestFractal::OnImGuiRender()
     }*/
 }
 
-void test::TestFractal::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
-{
-    
-}
-
-void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+void Fractal::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {    
     if (action == GLFW_PRESS && mods != GLFW_MOD_SHIFT)
     {
         void* data = glfwGetWindowUserPointer(window);
-        TestFractal* obj = static_cast<TestFractal*>(data);
+        Fractal* obj = static_cast<Fractal*>(data);
 
         int x = obj->m_windowWidth;
         int y = obj->m_windowHeight;
@@ -301,12 +298,12 @@ void test::TestFractal::mouse_button_callback(GLFWwindow* window, int button, in
     }
 }
 
-void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
         void* data = glfwGetWindowUserPointer(window);
-        TestFractal* obj = static_cast<TestFractal*>(data);
+        Fractal* obj = static_cast<Fractal*>(data);
 
         obj->m_stop = true;
         obj->m_doneRendering = false;
@@ -627,7 +624,7 @@ void test::TestFractal::key_callback(GLFWwindow* window, int key, int scancode, 
     }
 }
 
-void test::TestFractal::generateBuffers(float* buffer, unsigned int* indexes, int rows, int cols, float screenWidth, float screenHeight)
+void Fractal::generateBuffers(float* buffer, unsigned int* indexes, int rows, int cols, float screenWidth, float screenHeight)
 {
     rows++; cols++;
     for (int r = 0; r < rows; r++)
@@ -657,6 +654,6 @@ void test::TestFractal::generateBuffers(float* buffer, unsigned int* indexes, in
             //    << buffer[bufferPos + 2] << ", " << buffer[bufferPos + 3] << ") ";
         }
         //Uncomment the lines above to see the grids generated by this loop for either the index or vertex buffer
-        std::cout << std::endl;
+        //std::cout << std::endl;
     }
 }

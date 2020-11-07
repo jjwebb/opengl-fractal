@@ -9,7 +9,7 @@ file(GLOB_RECURSE HDRS ./*.hpp)
 
 add_executable(fractal  ${SRCS} ${HDRS})
 #${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm
-target_include_directories(fractal PRIVATE tests ${GLM_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm)
+target_include_directories(fractal PRIVATE ${GLM_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm)
 #find_library(glm ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm)
 #add_library(glm STATIC IMPORTED ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm)
 target_compile_definitions(fractal PRIVATE GLEW_NO_GLU GLEW_STATIC)

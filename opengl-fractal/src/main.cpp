@@ -2,29 +2,12 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include "Renderer.h"
-
-#include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "Shader.h"
-#include "Texture.h"
-
-#include "glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-#include "tests/Test.h"
-#include "tests/TestClearColor.h"
-#include "tests/TestTexture.h"
-#include "tests/TestFractal.h"
+#include "Fractal.h"
 
 int main(void)
 {
@@ -53,7 +36,6 @@ int main(void)
         return -1;
     }
 
-
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
@@ -68,39 +50,18 @@ int main(void)
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
         GLCall(glEnable(GL_BLEND));
 
-        //Renderer renderer;
-
         ImGui::CreateContext();
         ImGui_ImplGlfw_InitForOpenGL(window, true);
-        int versions = 0;
-        glGetIntegerv(GL_NUM_SHADING_LANGUAGE_VERSIONS, &versions);
+
         char* str = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
         std::cout<<"Version: "<<str<<std::endl;
+
         ImGui_ImplOpenGL3_Init("#version 300 es");
         ImGuiIO& io = ImGui::GetIO();
         ImFont* font = io.Fonts->AddFontFromFileTTF("res/fonts/courbd.ttf", 18.0f);
         IM_ASSERT(font != 0);
 
-        //test::TestClearColor testClearColor;
-        //test::TestTexture testTexture;
-        //test::Test* test = &testClearColor;
-        //test = &testTexture;
-
-        /*test::Test* currentTest = nullptr;
-        test::TestMenu* testMenu = new test::TestMenu(currentTest);
-        currentTest = testMenu;
-
-        testMenu->RegisterTest<test::TestClearColor>("Clear Color");
-        testMenu->RegisterTest<test::TestTexture>("Texture");
-        testMenu->RegisterTest<test::TestFractal>("Fractal", window);*/
-
-        test::TestFractal fractal(window);
-
-        double xpos, ypos;
-
-        int x, y;
-
-        glfwGetFramebufferSize(window, &x, &y);
+        Fractal fractal(window);
 
         while (!glfwWindowShouldClose(window))
         {
@@ -116,7 +77,7 @@ int main(void)
                     ImGui_ImplGlfw_NewFrame();
                     ImGui::NewFrame();
 
-                    fractal.OnUpdate(0.0f);
+                    fractal.OnUpdate();
                     fractal.OnRender();
 
                     ImGui::Begin("Mandelbrot", 0, ImGuiWindowFlags_NoTitleBar
@@ -130,7 +91,7 @@ int main(void)
                 }
                 else
                 {
-                    fractal.OnUpdate(0.0f);
+                    fractal.OnUpdate();
                     fractal.OnRender();
                 }
                 glfwSwapBuffers(window);
@@ -138,7 +99,6 @@ int main(void)
             /* Poll for and process events */
             glfwWaitEvents();
         }
-        //GLCall(glDeleteProgram(shader));
     }
 
     ImGui_ImplOpenGL3_Shutdown();
