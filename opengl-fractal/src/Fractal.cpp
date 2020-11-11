@@ -7,14 +7,6 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-//With a X/Y ratio of 5.0/2.8125 (16:9) the center of the screen is at
-//C coords (2.501302, 1.407552). We have to factor this into our equation for 
-//the zoom to scale properly
-#define XMUL 5.0f
-#define YMUL 2.8125f
-#define XSUBT 2.501302f
-#define YSUBT 1.407552f
-
 Fractal::Fractal(GLFWwindow* window)
     : 
     m_window(window),
@@ -25,8 +17,6 @@ Fractal::Fractal(GLFWwindow* window)
               Shader("res/shaders/Multijulia.shader")},//[4] -- Multi-julia only shader
     m_currentShader(1),
     m_Renderer(),
-    m_positions(),
-    m_indices(),
     m_va(),
     m_vb(),
     m_layout(),
@@ -54,11 +44,15 @@ Fractal::Fractal(GLFWwindow* window)
     m_imgChanged(false),
     m_doneRendering(false)
 {
+    float positions[4 * (GRIDRC + 1) * (GRIDRC + 1)];//Temporary vertex buffer to send to the GPU
+    unsigned int indices[6 * GRIDRC * GRIDRC];       //Temporary index buffer to send to the GPU
+
     //Produce our arrays to represent our render grid for the specified grid dims
-    generateBuffers(m_positions, m_indices, GRIDRC, GRIDRC, 1920.0f, 1080.0f);
-    //Send the arrays to the GPU through the VertexBuffer and IndexBuffer classes
-    m_vb.init(m_positions, (GRIDRC + 1) * (GRIDRC + 1) * 4 * sizeof(float));
-    m_ib.init(m_indices, 6 * GRIDRC * GRIDRC);
+    generateBuffers(positions, indices, GRIDRC, GRIDRC, 1920.0f, 1080.0f);
+
+    //Send the buffers to the GPU through the VertexBuffer and IndexBuffer classes
+    m_vb.init(positions, (GRIDRC + 1) * (GRIDRC + 1) * 4 * sizeof(float));
+    m_ib.init(indices, 6 * GRIDRC * GRIDRC);
 
     //Create the layout for our vertex buffer
     m_layout.Push<float>(2);
@@ -78,8 +72,7 @@ Fractal::Fractal(GLFWwindow* window)
     glfwGetFramebufferSize(m_window, &m_windowWidth, &m_windowHeight);
 
     //Set crosshair to the center of the screen
-    m_crosshair.x = m_windowWidth / 2 + 0.5f;
-    m_crosshair.y = m_windowHeight / 2 + 0.5f;
+    resetCrosshair();
 
     //Send variables to the GPU (must be done for each shader program)
     m_Shaders[0].SetUniformMat4f("u_MVP", m_proj);
@@ -142,7 +135,7 @@ void Fractal::MainRenderLoop()
         }
         else
             m_scaleFactor--;
-        //GLCall(glFinish());
+        GLCall(glFinish());
         auto elapsed = std::chrono::high_resolution_clock::now() - start;
         m_renderTime = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
         m_renderToTexture = 0;
@@ -171,21 +164,20 @@ void Fractal::Render()
 //Renders text information about the fractal -- toggle with 'i'
 void Fractal::OnImGuiRender()
 {    
-    //ImGui::Text("f(Z) = Z^%i + C", int(m_Exp));
     ImGui::Text("Avg %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    //ImGui::Text("f(Z) = Z^%i + C", m_Exp);
     //ImGui::SliderInt("Max iterations: ", &m_maxIterMax, 100, 3200);
     
+    if(m_Exp != 2.0f)
+        ImGui::Text("f(Z) = Z^%f + C", m_Exp);
+
     if (m_renderJulia)
     {
-        float zx = ((m_crosshair.x / m_windowWidth) * XMUL - XSUBT)
-            * m_zoom + m_offset.x;
-        float zy = ((m_crosshair.y / m_windowHeight) * YMUL - YSUBT)
-            * m_zoom + m_offset.y;
+        float zx = crosshairCoordX();
+        float zy = crosshairCoordY();
 
-        float cx = ((m_crosshairMandel.x / m_windowWidth) * XMUL - XSUBT)
-            * m_zoomMandel + m_offsetMandel.x; 
-        float cy = ((m_crosshairMandel.y / m_windowHeight) * YMUL - YSUBT)
-            * m_zoomMandel + m_offsetMandel.y;
+        float cx = crosshairMandelCoordX();
+        float cy = crosshairMandelCoordY();
 
         char chC = cy >= 0.0f ? '+' : '-';
         char chZ = zy >= 0.0f ? '+' : '-';
@@ -194,17 +186,12 @@ void Fractal::OnImGuiRender()
     }
     else
     {
-        float cx = ((m_crosshair.x / m_windowWidth) * XMUL - XSUBT)
-            * m_zoom + m_offset.x;
-        float cy = ((m_crosshair.y / m_windowHeight) * YMUL - YSUBT)
-            * m_zoom + m_offset.y;
+        float cx = crosshairCoordX();
+        float cy = crosshairCoordY();
 
         char chC = cy >= 0.0f ? '+' : '-';
         ImGui::Text("C = %f %c %fi", cx, chC, std::abs(cy));
     }
-    //ImGui::Text("X offset: %f Y offset: %f", m_offset.x, m_offset.y);
-    //ImGui::Text("X offset add: %f Y offset add: %f", ox, oy);
-    //ImGui::Text("Crosshair: X: %f Y: %f", m_crosshair.x, m_crosshair.y);
 
     ImGui::Text("Scale: %f (%ix)", m_zoom, (int)(1 / m_zoom));
     ImGui::Text("Render time: %lld", m_renderTime);
@@ -220,53 +207,37 @@ void Fractal::OnImGuiRender()
 
 void Fractal::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {    
+    //Holding shift lets you move the GUI window without changing anything else
     if (action == GLFW_PRESS && mods != GLFW_MOD_SHIFT)
     {
         void* data = glfwGetWindowUserPointer(window);
         Fractal* obj = static_cast<Fractal*>(data);
 
-        int x = obj->m_windowWidth;
-        int y = obj->m_windowHeight;
-
         if (mods == 0)
         {
-            obj->m_offset.x = ((obj->m_crosshair.x / x) * XMUL - XSUBT)
-                * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-            obj->m_offset.y = ((obj->m_crosshair.y / y) * YMUL - YSUBT)
-                * obj->m_zoom + obj->m_offset.y;
+            obj->m_offset.x = obj->crosshairCoordX();
+            obj->m_offset.y = obj->crosshairCoordY();
         }
 
-        if (button == GLFW_MOUSE_BUTTON_LEFT)
+        if (button == GLFW_MOUSE_BUTTON_LEFT) //Zoom in
         {
             obj->m_zoom /= 2.0f;
-            obj->m_offsetMandel.x = ((obj->m_crosshairMandel.x / x) * XMUL - XSUBT)
-                * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-            obj->m_offsetMandel.y = ((obj->m_crosshairMandel.y / y) * YMUL - YSUBT)
-                * obj->m_zoomMandel + obj->m_offsetMandel.y;
-            obj->m_crosshair.x = x / 2 + 0.5f;
-            obj->m_crosshair.y = y / 2 + 0.5f;
-            obj->m_crosshairMandel.x = obj->m_crosshair.x;
-            obj->m_crosshairMandel.y = obj->m_crosshair.y;
+            obj->m_offsetMandel.x = obj->crosshairMandelCoordX();
+            obj->m_offsetMandel.y = obj->crosshairMandelCoordY();
+            obj->resetCrosshair();
+            obj->resetCrosshairMandel();
             obj->m_scaleFactor = 2;
             obj->m_maxIter = obj->m_maxIterMax;
-            //obj->m_maxIter = 200;
         }
-        else if (button == GLFW_MOUSE_BUTTON_RIGHT)
+        else if (button == GLFW_MOUSE_BUTTON_RIGHT) //Zoom out
         {
             obj->m_zoom *= 2.0f;
-            obj->m_offsetMandel.x = ((obj->m_crosshairMandel.x / x) * XMUL - XSUBT)
-                * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-            obj->m_offsetMandel.y = ((obj->m_crosshairMandel.y / y) * YMUL - YSUBT)
-                * obj->m_zoomMandel + obj->m_offsetMandel.y;
-            obj->m_crosshair.x = x / 2 + 0.5f;
-            obj->m_crosshair.y = y / 2 + 0.5f;
-            obj->m_crosshairMandel.x = obj->m_crosshair.x;
-            obj->m_crosshairMandel.y = obj->m_crosshair.y;
-            /*obj->m_offsetMandel.x = obj->m_offset.x;
-            obj->m_offsetMandel.y = obj->m_offset.y;*/
+            obj->m_offsetMandel.x = obj->crosshairMandelCoordX();
+            obj->m_offsetMandel.y = obj->crosshairMandelCoordY();
+            obj->resetCrosshair();
+            obj->resetCrosshairMandel();
             obj->m_scaleFactor = 2;
             obj->m_maxIter = obj->m_maxIterMax;
-            //obj->m_maxIter = 200;
         }
         else
         {
@@ -304,10 +275,8 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 obj->m_imgChanged = true;
                 obj->m_crosshair.y += 20;
                 obj->m_crosshairMandel.y += 20;
-                float cx = ((obj->m_crosshairMandel.x / width) * XMUL - XSUBT)
-                    * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = ((obj->m_crosshairMandel.y / height) * YMUL - YSUBT)
-                    * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                float cx = obj->crosshairMandelCoordX();
+                float cy = obj->crosshairMandelCoordY();
                 obj->m_Shaders[obj->m_currentShader].SetUniform2f("u_cVals", cx, cy);
                 mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
             }
@@ -320,7 +289,6 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                     float tmp = obj->m_crosshair.x;
                     obj->m_crosshair.x = width / 2 + 0.5f;
                     mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
-                    //obj->m_crosshair.y = 2.5f;
                     obj->m_crosshair.y = height / 4 + 0.5f;
                     obj->m_crosshair.x = tmp;
                 }
@@ -333,10 +301,8 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 obj->m_imgChanged = true;
                 obj->m_crosshair.y -= 20;
                 obj->m_crosshairMandel.y -= 20;
-                float cx = ((obj->m_crosshairMandel.x / width) * XMUL - XSUBT)
-                    * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = ((obj->m_crosshairMandel.y / height) * YMUL - YSUBT)
-                    * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                float cx = obj->crosshairMandelCoordX();
+                float cy = obj->crosshairMandelCoordY();
                 obj->m_Shaders[obj->m_currentShader].SetUniform2f("u_cVals", cx, cy);
                 mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
             }
@@ -349,7 +315,6 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                     float tmp = obj->m_crosshair.x;
                     obj->m_crosshair.x = width / 2 + 0.5f;
                     mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
-                    //obj->m_crosshair.y = height - 2.5f;
                     obj->m_crosshair.y = height - (height / 4) - 0.5f;
                     obj->m_crosshair.x = tmp;
                 }
@@ -362,10 +327,8 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 obj->m_imgChanged = true;
                 obj->m_crosshair.x -= 20;
                 obj->m_crosshairMandel.x -= 20;
-                float cx = ((obj->m_crosshairMandel.x / width) * XMUL - XSUBT)
-                    * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = ((obj->m_crosshairMandel.y / height) * YMUL - YSUBT)
-                    * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                float cx = obj->crosshairMandelCoordX();
+                float cy = obj->crosshairMandelCoordY();
                 obj->m_Shaders[obj->m_currentShader].SetUniform2f("u_cVals", cx, cy);
                 mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
             }
@@ -390,10 +353,8 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 obj->m_imgChanged = true;
                 obj->m_crosshair.x += 20;
                 obj->m_crosshairMandel.x += 20;
-                float cx = ((obj->m_crosshairMandel.x / width) * XMUL - XSUBT)
-                    * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = ((obj->m_crosshairMandel.y / height) * YMUL - YSUBT)
-                    * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                float cx = obj->crosshairMandelCoordX();
+                float cy = obj->crosshairMandelCoordY();
                 obj->m_Shaders[obj->m_currentShader].SetUniform2f("u_cVals", cx, cy);
 
                 mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 2);
@@ -441,16 +402,13 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 }
                 else
                     obj->m_currentShader = 3;
-                float cx = ((obj->m_crosshair.x / width) * XMUL - XSUBT)
-                    * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = ((obj->m_crosshair.y / height) * YMUL - YSUBT)
-                    * obj->m_zoom + obj->m_offset.y;
+                float cx = obj->crosshairCoordX();
+                float cy = obj->crosshairCoordY();
                 obj->m_Shaders[obj->m_currentShader].SetUniform2f("u_cVals", cx, cy);
                 
                 obj->m_offsetMandel.x = cx;
                 obj->m_offsetMandel.y = cy;
-                obj->m_crosshairMandel.x = width / 2 + 0.5f;
-                obj->m_crosshairMandel.y = height / 2 + 0.5f;
+                obj->resetCrosshairMandel();
                 obj->m_zoomMandel = obj->m_zoom;
                 if (key == GLFW_KEY_H)
                 {
@@ -462,8 +420,7 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
             }
             else
             {
-                //If exponent == 2, render Mandelbrot. Otherwise, render multibrot
-                //obj->m_currentShader = obj->m_Exp == 2.0f ? 1 : 2;
+                //Render multibrot if exponent > 2, otherwise render regular mandelbrot
                 if (obj->m_Exp > 2.0f)
                 {
                     obj->m_currentShader = 2;
@@ -477,12 +434,10 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 obj->m_crosshair.y = obj->m_crosshairMandel.y;
                 obj->m_zoom = obj->m_zoomMandel;
             }
-            //obj->m_Shader.SetUniform1i("u_julia", !obj->m_renderJulia);
             obj->m_renderJulia = !obj->m_renderJulia;
             mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 
                 key == GLFW_KEY_J ? 0 : 2);
-            obj->m_crosshair.x = width / 2 + 0.5f;
-            obj->m_crosshair.y = height / 2 + 0.5f;
+            obj->resetCrosshair();
             break;
         }
 
@@ -490,39 +445,42 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
         case GLFW_KEY_N:
             obj->m_imgChanged = true;
             obj->m_currentShader = obj->m_renderJulia ? 4 : 2;
-            obj->m_Shaders[obj->m_currentShader].SetUniform1f("u_Exp", obj->m_Exp + 1.0f);
-            obj->m_Exp++;
+            obj->m_Shaders[obj->m_currentShader].SetUniform1f("u_Exp", obj->m_Exp + .05f);
+            obj->m_Exp+= 0.05f;
             mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
-            obj->m_crosshair.x = width / 2 + 0.5f;
-            obj->m_crosshair.y = height / 2 + 0.5f;
+            obj->resetCrosshair();
             break;
         case GLFW_KEY_P:
-            if (obj->m_Exp > 2.0f)
+            if (obj->m_Exp > -1.0f)
             {
                 obj->m_imgChanged = true;
-                obj->m_Exp--;
-                if(static_cast<int>(obj->m_Exp) == 2)
+                obj->m_Exp-= .05f;
+                if(obj->m_Exp == 2.0f)
                     obj->m_currentShader = obj->m_renderJulia ? 3 : 1;
+                else if (std::abs(obj->m_Exp - 2.0) < .0005)
+                {
+                    obj->m_Exp = 2.0f;
+                    obj->m_currentShader = obj->m_renderJulia ? 3 : 1;
+                }
                 else
                 {
                     obj->m_currentShader = obj->m_renderJulia ? 4 : 2;
                     obj->m_Shaders[obj->m_currentShader].SetUniform1f("u_Exp", obj->m_Exp);
                 }
                 mouse_button_callback(window, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS, 0);
-                obj->m_crosshair.x = width / 2 + 0.5f;
-                obj->m_crosshair.y = height / 2 + 0.5f;
+                obj->resetCrosshair();
             }
             break;
+
         case GLFW_KEY_ESCAPE:
-          glfwSetWindowShouldClose(window, GLFW_TRUE);
-          break;
-        case GLFW_KEY_Z:
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+            break;
+
+        case GLFW_KEY_Z: //Outputs iteration loop values to the console
             if (!obj->m_renderJulia)
             {
-                float cx = ((obj->m_crosshair.x / width) * XMUL - XSUBT)
-                    * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = ((obj->m_crosshair.y / height) * YMUL - YSUBT)
-                    * obj->m_zoom + obj->m_offset.y;
+                float cx = obj->crosshairCoordX();
+                float cy = obj->crosshairCoordY();
                 int iter;
                 float x = 0.0f; float y = 0.0f; float xtmp = 0.0f;
                 float xLast = 0.0f;
@@ -541,15 +499,12 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
             }
             else
             {
-                float cx = ((obj->m_crosshairMandel.x / width) * XMUL - XSUBT)
-                    * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-                float cy = ((obj->m_crosshairMandel.y / height) * YMUL - YSUBT)
-                    * obj->m_zoomMandel + obj->m_offsetMandel.y;
+                float cx = obj->crosshairMandelCoordX();
+                float cy = obj->crosshairMandelCoordY();
 
-                float zx = ((obj->m_crosshair.x / width) * XMUL - XSUBT)
-                    * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-                float zy = ((obj->m_crosshair.y / height) * YMUL - YSUBT)
-                    * obj->m_zoom + obj->m_offset.y;
+                float zx = obj->crosshairCoordX();
+                float zy = obj->crosshairCoordY();
+
                 int iter;
                 float xtmp = 0.0f;
                 float lastx = 0.0f;
@@ -578,24 +533,19 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 }
                 std::cout << std::setprecision(50) << "ZX: " << zx << " ZY: " << zy << " iter: " << iter << 
                     " n2: " << n2 << " n: " << n << std::endl << std::endl;
-                break;
             }
-        case GLFW_KEY_I:
+        break;
+        case GLFW_KEY_I: //Toggie GUI
             obj->m_showGui = !obj->m_showGui;
             break;
-        case GLFW_KEY_C:
-            obj->m_offset.x = ((obj->m_crosshair.x / obj->m_windowWidth) * XMUL - XSUBT)
-                * obj->m_zoom + obj->m_offset.x; //translate screen coords to -3 to 1.8, 4.8
-            obj->m_offset.y = ((obj->m_crosshair.y / obj->m_windowHeight) * YMUL - YSUBT)
-                * obj->m_zoom + obj->m_offset.y;
-            obj->m_offsetMandel.x = ((obj->m_crosshairMandel.x / obj->m_windowWidth) * XMUL - XSUBT)
-                * obj->m_zoomMandel + obj->m_offsetMandel.x; //translate screen coords to -3 to 1.8, 4.8
-            obj->m_offsetMandel.y = ((obj->m_crosshairMandel.y / obj->m_windowHeight) * YMUL - YSUBT)
-                * obj->m_zoomMandel + obj->m_offsetMandel.y;
-            obj->m_crosshair.x = obj->m_windowWidth / 2 + 0.5f;
-            obj->m_crosshair.y = obj->m_windowHeight / 2 + 0.5f;
-            obj->m_crosshairMandel.x = obj->m_crosshair.x;
-            obj->m_crosshairMandel.y = obj->m_crosshair.y;
+
+        case GLFW_KEY_C: //Re-center the screen at the crosshair
+            obj->m_offset.x = obj->crosshairCoordX();
+            obj->m_offset.y = obj->crosshairCoordY();
+            obj->m_offsetMandel.x = obj->crosshairMandelCoordX();
+            obj->m_offsetMandel.y = obj->crosshairMandelCoordY();
+            obj->resetCrosshair();
+            obj->resetCrosshairMandel();
             obj->m_scaleFactor = 2;
             obj->m_maxIter = obj->m_maxIterMax;
             obj->m_Shaders[obj->m_currentShader].SetUniform2f("u_offset", obj->m_offset.x, obj->m_offset.y);
@@ -604,6 +554,8 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
     }
 }
 
+/*generateBuffers generates a grid of (rows * cols) tiles to render to. We will check for user input after each
+  tile is rendered -- more tiles is more responsive to input but ultimately slower as it's checking more often*/
 void Fractal::generateBuffers(float* buffer, unsigned int* indexes, int rows, int cols, float screenWidth, float screenHeight)
 {
     rows++; cols++;
