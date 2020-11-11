@@ -13,32 +13,36 @@ int main(void)
 {
     GLFWwindow* window;
 
-    /* Initialize the library */
+    //GLFW must be initialized before GLEW
     if (!glfwInit())
         return -1;
 
+    //Raspberry Pi 4B supports up to OpenGL 3.1 ES
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-    /* Create a windowed mode window and its OpenGL context */
+
+    //Create a fullscreen window
     window = glfwCreateWindow(1920, 1080, "Mandelbrot", glfwGetPrimaryMonitor(), NULL);
     const char * err;
     int code = glfwGetError(&err);
-    if (err != GLFW_NO_ERROR)
+    if (err != GLFW_NO_ERROR || !window)
     {
         std::cout<<"GLFW error "<<code<<": "<<err<<std::endl;
-    }
-    glfwSetWindowAspectRatio(window, 16, 9);
-    if (!window)
-    {
         glfwTerminate();
         return -1;
     }
 
-    /* Make the window's context current */
+    //Lock aspect ratio to 16:9
+    glfwSetWindowAspectRatio(window, 16, 9);
+
+    //Disable the cursor
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    //Make the window's context current
     glfwMakeContextCurrent(window);
 
+    //Set refresh rate (0 = unlimited)
     glfwSwapInterval(0);
 
     if (glewInit() != GLEW_OK)
@@ -46,39 +50,38 @@ int main(void)
 
     std::cout << glGetString(GL_VERSION) << std::endl;
     {
-
-        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-        GLCall(glEnable(GL_BLEND));
+        //GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+        //GLCall(glEnable(GL_BLEND));
 
         ImGui::CreateContext();
         ImGui_ImplGlfw_InitForOpenGL(window, true);
 
         char* str = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
         std::cout<<"Version: "<<str<<std::endl;
-
+        //Tell ImGui which GLSL version to use
         ImGui_ImplOpenGL3_Init("#version 300 es");
+        //Load custom font (Courier New Bold)
         ImGuiIO& io = ImGui::GetIO();
         ImFont* font = io.Fonts->AddFontFromFileTTF("res/fonts/courbd.ttf", 18.0f);
         IM_ASSERT(font != 0);
 
         Fractal fractal(window);
 
+        //Main loop -- runs until Esc is pressed
         while (!glfwWindowShouldClose(window))
         {
-            //glfwGetCursorPos(window, &xpos, &ypos);
-            //GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-            //GLCall(glClear(GL_COLOR_BUFFER_BIT));
-            //renderer.Clear();
+            //Loop will render a frame at a low resolution and keep rendering until
+            //the final pass is made at full res
             while (!fractal.doneRendering())
             {
+                //Coordinate info/GUI is toggled with i key
                 if (fractal.showGUI())
                 {
                     ImGui_ImplOpenGL3_NewFrame();
                     ImGui_ImplGlfw_NewFrame();
                     ImGui::NewFrame();
 
-                    fractal.OnUpdate();
-                    fractal.OnRender();
+                    fractal.MainRenderLoop();
 
                     ImGui::Begin("Mandelbrot", 0, ImGuiWindowFlags_NoTitleBar
                         | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
@@ -90,17 +93,17 @@ int main(void)
                     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
                 }
                 else
-                {
-                    fractal.OnUpdate();
-                    fractal.OnRender();
-                }
+                    fractal.MainRenderLoop();
+
+                //Show the rendered frame on the screen
                 glfwSwapBuffers(window);
             }
-            /* Poll for and process events */
+            //Wait for a keypress
             glfwWaitEvents();
         }
     }
 
+    //Clean everything up
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

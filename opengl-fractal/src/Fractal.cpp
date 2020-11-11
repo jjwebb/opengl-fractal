@@ -7,19 +7,13 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+//With a X/Y ratio of 5.0/2.8125 (16:9) the center of the screen is at
+//C coords (2.501302, 1.407552). We have to factor this into our equation for 
+//the zoom to scale properly
 #define XMUL 5.0f
 #define YMUL 2.8125f
-//#define XSUBT 2.8125f
-//With a X/Y ratio of 5.0/2.8125 (16:9) the center of the screen is at
-//C coords (-.310547, .001953). We have to add this into our equation for 
-//the zoom to scale properly
-//#define XSUBT 2.501953f
 #define XSUBT 2.501302f
 #define YSUBT 1.407552f
-//#define YSUBT 1.40625f
-//#define YSUBT 1.408203f
-//#define XADD 0.310547f
-//#define YADD -0.001953f
 
 Fractal::Fractal(GLFWwindow* window)
     : 
@@ -60,55 +54,47 @@ Fractal::Fractal(GLFWwindow* window)
     m_imgChanged(false),
     m_doneRendering(false)
 {
-
+    //Produce our arrays to represent our render grid for the specified grid dims
     generateBuffers(m_positions, m_indices, GRIDRC, GRIDRC, 1920.0f, 1080.0f);
+    //Send the arrays to the GPU through the VertexBuffer and IndexBuffer classes
     m_vb.init(m_positions, (GRIDRC + 1) * (GRIDRC + 1) * 4 * sizeof(float));
     m_ib.init(m_indices, 6 * GRIDRC * GRIDRC);
 
+    //Create the layout for our vertex buffer
     m_layout.Push<float>(2);
     m_layout.Push<float>(2);
 
+    //Send the layout to the GPU so it knows how to process our buffer
     m_va.AddBuffer(m_vb, m_layout);
 
-    //m_Shader.Bind();
-  
+    //Allow glfw to access data from this class object
     glfwSetWindowUserPointer(m_window, this);
+
+    //Set event handlers
     glfwSetMouseButtonCallback(m_window, mouse_button_callback);
     glfwSetKeyCallback(m_window, key_callback);
 
-    //int x, y;
+    //Get the size of the window (screen)
     glfwGetFramebufferSize(m_window, &m_windowWidth, &m_windowHeight);
+
+    //Set crosshair to the center of the screen
     m_crosshair.x = m_windowWidth / 2 + 0.5f;
     m_crosshair.y = m_windowHeight / 2 + 0.5f;
-    //for (Shader s : m_Shaders)
-    //{
-    //m_Shaders[0].Bind();
+
+    //Send variables to the GPU (must be done for each shader program)
     m_Shaders[0].SetUniformMat4f("u_MVP", m_proj);
-        m_Shaders[0].SetUniform2f("u_FramebufferSize", (float)m_windowWidth, (float)m_windowHeight);
-    //}
+    m_Shaders[0].SetUniform2f("u_FramebufferSize", (float)m_windowWidth, (float)m_windowHeight);
     
     for (int i = 1; i < 5; i++)
     {
-        //m_Shaders[i].Bind();
         m_Shaders[i].SetUniformMat4f("u_MVP", m_proj);
         m_Shaders[i].SetUniform2f("u_FramebufferSize", (float)m_windowWidth, (float)m_windowHeight);
         m_Shaders[i].SetUniform2f("u_offset", m_offset.x, m_offset.y);
         m_Shaders[i].SetUniform1f("u_zoom", m_zoom);
     }
-    
-    //m_Shader.SetUniform1f("u_Exp", m_Exp);
-    //m_Shader.SetUniform1i("u_Texture", 0);
-    //m_Shader.SetUniform1i("u_julia", m_renderJulia);
-
-    OnUpdate();
-    //m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
-    //m_fb.renderToTexture(m_scaleFactor);           //rendering the same image over and over
-    //OnRender();
-    //m_Shader.SetUniform1i("u_renderToTexture", 0);
-    //m_fb.renderToScreen();
-    OnRender();
 }
 
+//Destroying the object closes the program and frees everything
 Fractal::~Fractal()
 {
     glfwSetWindowUserPointer(m_window, NULL);
@@ -116,55 +102,64 @@ Fractal::~Fractal()
     glfwSetKeyCallback(m_window, NULL);
 }
 
-void Fractal::OnUpdate()
+//Main logic loop - prepare to render on the GPU
+void Fractal::MainRenderLoop()
 {
     m_imgChanged = false;
-    if (m_maxIter <= m_maxIterMax) //check if this was already set
+
+    //Double the maximum iterations of the fractal equation every render until the specified threshold
+    if (m_maxIter <= m_maxIterMax)
     {
         m_Shaders[m_currentShader].SetUniform1i("ITER_MAX", m_maxIter);
-        //m_maxIterLast = m_maxIter;
         m_maxIter *= 2;
-        if (m_scaleFactor == 1)
+        if (m_scaleFactor == 1)//ONLY render at full scale resolution once we've reached the specified threshold
             m_scaleFactor = 2;
     }
+
+    //Render at progressively higher resolutions until full-scale 
     if (m_scaleFactor > 0)
     {
-        m_Shaders[m_currentShader].SetUniform2f("u_FramebufferSize", (float)(m_windowWidth/m_scaleFactor), (float)(m_windowHeight/m_scaleFactor));
-        //m_Shader.SetUniform2f("u_crossHairCoord", m_crosshair.x/m_scaleFactor, m_crosshair.y/m_scaleFactor);
+        //Set new window size to the appropriately scaled-down size
+        m_Shaders[m_currentShader].SetUniform2f("u_FramebufferSize", 
+            (float)(m_windowWidth/m_scaleFactor), (float)(m_windowHeight/m_scaleFactor));
 
         auto start = std::chrono::high_resolution_clock::now();
+
+        /*Render a single frame of the fractal to a texture that will be sampled 
+        instead of rendering the same image over and over*/
         m_renderToTexture = 1;
-        //Render a single frame of the fractal to a texture that will be sampled instead of
-        m_fb.renderToTexture(m_scaleFactor);//rendering the same image over and over
-        OnRender();
+        m_fb.renderToTexture(m_scaleFactor);
+        Render();
         if (m_stop)//Render stops if a key is pressed mid-render
         { 
             if (m_imgChanged)
             {
-                OnUpdate(); 
+                MainRenderLoop(); 
                 return; 
             }
             else
-            {
                 m_fb.renderToTexture(m_scaleFactor + 1);
-            }
         }
         else
             m_scaleFactor--;
-        GLCall(glFinish());
+        //GLCall(glFinish());
         auto elapsed = std::chrono::high_resolution_clock::now() - start;
         m_renderTime = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
         m_renderToTexture = 0;
         m_fb.renderToScreen();
     }
-    //m_Shaders[0].SetUniform2f("u_FramebufferSize", (float)x, (float)y);
+
     m_Shaders[0].SetUniform2f("u_crossHairCoord", m_crosshair.x, m_crosshair.y);
 
+    //Keep running the render loop until we're at max iterations and full resolution
     if (m_maxIter >= m_maxIterMax && m_scaleFactor == 0)
         m_doneRendering = true;
+
+    Render();
 }
 
-void Fractal::OnRender()
+//Send the actual render/draw call to the GPU
+void Fractal::Render()
 {
     m_stop = false;
     if(m_renderToTexture)
@@ -173,6 +168,7 @@ void Fractal::OnRender()
         m_Renderer.Draw(m_va, m_ib, m_Shaders[0]);
 }
 
+//Renders text information about the fractal -- toggle with 'i'
 void Fractal::OnImGuiRender()
 {    
     //ImGui::Text("f(Z) = Z^%i + C", int(m_Exp));
@@ -279,22 +275,6 @@ void Fractal::mouse_button_callback(GLFWwindow* window, int button, int action, 
         }
         obj->m_Shaders[obj->m_currentShader].SetUniform2f("u_offset", obj->m_offset.x, obj->m_offset.y);
         obj->m_Shaders[obj->m_currentShader].SetUniform1f("u_zoom", obj->m_zoom);
-
-        //auto start = std::chrono::high_resolution_clock::now();
-        //This is where we set how many render passes we will do
-        //obj->m_scaleFactor = 3;
-        //obj->m_maxIterLast = obj->m_maxIter;
-        
-        /*obj->m_Shader.SetUniform1i("u_renderToTexture", 1); //Render a single frame of the fractal to a texture that will be sampled instead of
-        obj->m_fb.renderToTexture(obj->m_scaleFactor);      //rendering the same image over and over
-        obj->OnUpdate(0);
-        obj->OnRender();
-        GLCall(glFinish());
-        auto elapsed = std::chrono::high_resolution_clock::now() - start;
-        obj->m_renderTime = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-        obj->m_Shader.SetUniform1i("u_renderToTexture", 0);
-        obj->m_fb.renderToScreen();
-        obj->m_scaleFactor = 1;*/
     }
 }
 

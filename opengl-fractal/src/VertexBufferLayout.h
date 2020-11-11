@@ -14,15 +14,19 @@ struct VertexBufferElement
 	{
 		switch (type)
 		{
-			case GL_FLOAT:			return 4;
-			case GL_UNSIGNED_INT:	return 4;
-			case GL_UNSIGNED_BYTE:	return 1;
+			case GL_FLOAT:			return 4;//size 4 bytes
+			case GL_UNSIGNED_INT:	return 4;//size 4 bytes
+			case GL_UNSIGNED_BYTE:	return 1;//size 1 byte
 		}
-		ASSERT(false);
+		ASSERT(false);//Throw an error if the type given wasn't in the list
 		return 0;
 	}
 };
 
+/*This class specifes the layout for the vertex buffer -- the stride (offset) in bytes 
+for each element in the array. In this fractal project we have a stride of 16 -- two
+4-byte floats representing primitive vertex coordinates and another two for 
+texture mapping coordinates*/ 
 class VertexBufferLayout
 {
 private:

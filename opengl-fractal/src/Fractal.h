@@ -13,16 +13,15 @@ public:
 	Fractal(GLFWwindow* window);
 	~Fractal();
 
-	void OnUpdate();
-	void OnRender();
-	void OnImGuiRender();
+	void MainRenderLoop();//Main logic loop - prepare to render on the GPU
+	void OnImGuiRender(); //GUI render logic
 	inline bool showGUI() const { return m_showGui; }
 	inline bool doneRendering() const { return m_doneRendering; }
 private:
 	GLFWwindow* m_window;
 	Shader m_Shaders[5];
-	int m_currentShader; //Should be value 1 though 4, for indexes of m_Shaders. 
-						 //Index 0 is the crosshair shader, and is always drawn. 
+	int m_currentShader;  //Should be value 1 though 4, for indexes of m_Shaders. 
+						  //Index 0 is the crosshair shader, and is always drawn. 
 	Renderer m_Renderer;
 	float m_positions[4 * (GRIDRC + 1) * (GRIDRC + 1)];
 	unsigned int m_indices[6 * GRIDRC * GRIDRC];
@@ -53,9 +52,10 @@ private:
 	bool m_imgChanged;   //If the keypress registered changed the image, scrap the image and start over
 	bool m_doneRendering;//True if we have rendered all frames we need to, up to full res scale and maxIterMax
 
-	//generateBuffers generates a grid of (rows * cols) tiles to render to. We will check for user input after each
-	//tile is rendered -- more tiles is more responsive to input but ultimately slower as it's checking more often
+	/*generateBuffers generates a grid of (rows * cols) tiles to render to. We will check for user input after each
+	  tile is rendered -- more tiles is more responsive to input but ultimately slower as it's checking more often*/
 	void generateBuffers(float* buffer, unsigned int* indexes, int rows, int cols, float screenWidth, float screenHeight);
+	void Render();      //Render on the GPU
 	static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };
