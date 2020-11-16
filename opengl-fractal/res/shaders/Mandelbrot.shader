@@ -27,7 +27,6 @@ out vec4 color;
 
 uniform vec2 u_FramebufferSize;
 uniform vec2 u_offset;
-uniform vec2 u_cVals;
 uniform int ITER_MAX;
 uniform float u_zoom;
 
