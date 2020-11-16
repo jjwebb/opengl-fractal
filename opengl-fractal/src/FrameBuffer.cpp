@@ -47,6 +47,7 @@ void FrameBuffer::renderToTexture(int scaleFactor)
 	//glfwGetFramebufferSize(m_window, &width, &height);
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer[scaleFactor-1]));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture[scaleFactor-1]));
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	//GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture));
 	
 	//GLCall(glViewport(0, 0, width, height));
