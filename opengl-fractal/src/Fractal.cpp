@@ -210,6 +210,7 @@ void Fractal::zoom(bool zoomIn)
     m_offsetMandel.y = crosshairMandelCoordY();
     resetCrosshair();
     resetCrosshairMandel();
+    m_imgChanged = true;
     m_scaleFactor = 2;
     m_maxIter = m_maxIterMax;
     m_Shaders[m_currentShader].SetUniform1f("u_zoom", m_zoom);
@@ -531,6 +532,7 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
             obj->m_offsetMandel.y = obj->crosshairMandelCoordY();
             obj->resetCrosshair();
             obj->resetCrosshairMandel();
+            obj->m_imgChanged = true;
             obj->m_scaleFactor = 2;
             obj->m_maxIter = obj->m_maxIterMax;
             break;
@@ -539,6 +541,7 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
             obj->resetOffset();
             obj->resetCrosshair();
             obj->m_scaleFactor = 2;
+            obj->m_imgChanged = true;
             obj->m_maxIter = obj->m_maxIterMax;
             obj->m_zoom = 1.0f;
             obj->m_Shaders[obj->m_currentShader].SetUniform1f("u_zoom", obj->m_zoom);
