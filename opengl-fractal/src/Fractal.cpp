@@ -3,9 +3,6 @@
 #include "Fractal.h"
 
 #include "glm/gtc/matrix_transform.hpp"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
 
 Fractal::Fractal(GLFWwindow* window)
     : 
@@ -22,7 +19,6 @@ Fractal::Fractal(GLFWwindow* window)
     m_layout(),
     m_ib(),
     m_fb(window),
-    m_scale(1.0f, 1.0f, 1.0f),
     m_proj(glm::ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f)),
     m_crosshair(0.0f, 0.0f),
     m_crosshairMandel(0.0f, 0.0f),
@@ -30,11 +26,13 @@ Fractal::Fractal(GLFWwindow* window)
     m_offset(0.0f, 0.0f),
     m_offsetMandel(0.0f, 0.0f),
     m_offsetMandelStatic(0.0f, 0.0f),
+    m_guiWindowPos(1655.0f, 1020.0f),
     m_zoom(1.0f),
     m_zoomMandel(0.0f),
     m_Exp(2.0f),
     m_deltaExp(0.05f),
     m_showGui(true),
+    m_showRenderTime(false),
     m_renderJulia(false),
     m_renderToTexture(true),
     m_renderTime(0),
@@ -165,14 +163,10 @@ void Fractal::Render()
 //Renders text information about the fractal -- toggle with 'i'
 void Fractal::OnImGuiRender()
 {    
-    //ImGui::Text("Avg %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    //ImGui::Text("f(Z) = Z^%i + C", m_Exp);
-    //ImGui::SliderInt("Max iterations: ", &m_maxIterMax, 100, 3200);
-    
     if (m_Exp != 2.0f)
     {
-        ImGui::Text("f(Z) = Z^d + C");
-        ImGui::Text("d = %.2f (+- %.2f)", m_Exp, m_deltaExp);
+        ImGui::Text("Z |-> Z^d + C");
+        ImGui::Text("d =  %.2f (+- %.2f)", m_Exp, m_deltaExp);
     }
 
     if (m_renderJulia)
@@ -185,8 +179,8 @@ void Fractal::OnImGuiRender()
 
         char chC = cy >= 0.0f ? '+' : '-';
         char chZ = zy >= 0.0f ? '+' : '-';
-        ImGui::Text("C = %f %c %fi", cx, chC, std::abs(cy));
-        ImGui::Text("Z = %f %c %fi", zx, chZ, std::abs(zy));
+        ImGui::Text(cx >= 0.0f ? "C =  %f %c %fi" : "C = %f %c %fi", cx, chC, std::abs(cy));
+        ImGui::Text(zx >= 0.0f ? "Z =  %f %c %fi" : "Z = %f %c %fi", zx, chZ, std::abs(zy));
     }
     else
     {
@@ -194,11 +188,12 @@ void Fractal::OnImGuiRender()
         float cy = crosshairCoordY();
 
         char chC = cy >= 0.0f ? '+' : '-';
-        ImGui::Text("C = %f %c %fi", cx, chC, std::abs(cy));
+        ImGui::Text(cx >= 0.0f ? "C =  %f %c %fi" : "C = %f %c %fi", cx, chC, std::abs(cy));
     }
 
     ImGui::Text("Scale: %f (%ix)", m_zoom, (int)(1 / m_zoom));
-    ImGui::Text("Render time: %lld", m_renderTime);
+    if(m_showRenderTime)
+        ImGui::Text("Render time: %lld", m_renderTime);
 }
 
 void Fractal::zoom(bool zoomIn)
@@ -220,6 +215,7 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
 {
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
+        //GLFW allows us to set a pointer to a specified object to access member data
         void* data = glfwGetWindowUserPointer(window);
         Fractal* obj = static_cast<Fractal*>(data);
 
@@ -231,9 +227,9 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
 
         switch(key)
         { 
-        //WASD move the crosshair AND the value of C (changing the julia set displayed when in julia mode),
-        //effectively moving the crosshair as if the Mandelbrot set were still displayed.
-        //UP DOWN LEFT RIGHT move ONLY the crosshair (leaving the julia set unchanged)
+        /*WASD move the crosshair AND the value of C (changing the julia set displayed when in julia mode),
+          effectively moving the crosshair as if the Mandelbrot set were still displayed.
+          UP DOWN LEFT RIGHT move ONLY the crosshair (leaving the julia set unchanged)*/
         case GLFW_KEY_W:
         case GLFW_KEY_UP:
 
@@ -336,8 +332,10 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
             obj->zoom(true);
             break;
 
-        //Pressing the J key activates Julia mode and renders a julia set for the given
-        //point C on the mandelbrot set pointed to by the crosshair
+        /*Pressing the J key activates Julia mode and renders a julia set for the given point C
+        on the mandelbrot set pointed to by the crosshair. Pressing J again puts you back on the
+        mandelbrot set at whatever point you changed to (if you changed the Julia set with WASD),
+        while pressing H returns you to where you were when you originally pressed J/H*/
         case GLFW_KEY_J:
         case GLFW_KEY_H:
         {
@@ -371,6 +369,9 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 else
                     obj->setOffset();
                 obj->resetCrosshairMandel();
+
+                obj->m_guiWindowPos.y -= 22.0f;
+                ImGui::SetWindowPos("Mandelbrot", obj->m_guiWindowPos);
             }
             else
             {
@@ -402,6 +403,9 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 }
                 
                 obj->m_Shaders[obj->m_currentShader].SetUniform2f("u_offset", obj->m_offset.x, obj->m_offset.y);
+
+                obj->m_guiWindowPos.y += 22.0f;
+                ImGui::SetWindowPos("Mandelbrot", obj->m_guiWindowPos);
             }
             obj->m_renderJulia = !obj->m_renderJulia;
   
@@ -415,16 +419,22 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
         //Pressing N raises the exponent in Z^n + C by deltaExp, P lowers it by deltaExp
         case GLFW_KEY_N:
         case GLFW_KEY_P:
-            if ( key == GLFW_KEY_N || obj->m_Exp > 0.0f)
+            if ( key == GLFW_KEY_N || obj->m_Exp >= obj->m_deltaExp)
             {
                 obj->m_Exp+= key == GLFW_KEY_N ? obj->m_deltaExp : -obj->m_deltaExp;
                 int shader = obj->m_currentShader;
-                if(obj->m_Exp == 2.0f)
+                if (obj->m_Exp == 2.0f)
+                {
                     obj->m_currentShader = obj->m_renderJulia ? SHADER_JULIA : SHADER_MANDELBROT;
+                    obj->m_guiWindowPos.y += 88.0f;
+                    ImGui::SetWindowPos("Mandelbrot", obj->m_guiWindowPos);
+                }
                 else if (std::abs(obj->m_Exp - 2.0) < .0005)
                 {
                     obj->m_Exp = 2.0f;
                     obj->m_currentShader = obj->m_renderJulia ? SHADER_JULIA : SHADER_MANDELBROT;
+                    obj->m_guiWindowPos.y += 88.0f;
+                    ImGui::SetWindowPos("Mandelbrot", obj->m_guiWindowPos);
                 }
                 else
                 {
@@ -433,6 +443,8 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 }
                 if (obj->m_currentShader != shader)
                 {
+                    obj->m_guiWindowPos.y -= 44.0f;
+                    ImGui::SetWindowPos("Mandelbrot", obj->m_guiWindowPos);
                     obj->m_Shaders[obj->m_currentShader].SetUniform2f("u_offset", obj->m_offset.x, obj->m_offset.y);
                     obj->m_Shaders[obj->m_currentShader].SetUniform1f("u_zoom", obj->m_zoom);
                     if (obj->m_currentShader == SHADER_JULIA || obj->m_currentShader == SHADER_MULTIJULIA)
@@ -446,7 +458,7 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
             }
             break;
 
-        case GLFW_KEY_PERIOD:
+        case GLFW_KEY_PERIOD: //Change how much the exponent of our function increments by
             if (obj->m_deltaExp == 0.01f)
                 obj->m_deltaExp = 0.05f;
             else if (obj->m_deltaExp == 0.05f)
@@ -459,71 +471,14 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 obj->m_deltaExp = 0.01f;
             break;
 
-        case GLFW_KEY_ESCAPE:
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
-            break;
-
-        case GLFW_KEY_Z: //Outputs iteration loop values to the console
-            if (!obj->m_renderJulia)
-            {
-                float cx = obj->crosshairCoordX();
-                float cy = obj->crosshairCoordY();
-                int iter;
-                float x = 0.0f; float y = 0.0f; float xtmp = 0.0f;
-                float xLast = 0.0f;
-                for (iter = 0; iter < 100; iter++)
-                {
-                    xtmp = x * x - y * y + cx;
-                    y = 2.0f * x * y + cy;
-                    if (xtmp * xtmp + y * y > 4.0f)
-                        break;
-                    xLast = x;
-                    x = xtmp;
-                    std::cout << std::setprecision(50) << "X: " << x << " Y: " << y << " X==Xlast: " << (x == xLast) << std::endl;
-                }
-                std::cout << std::setprecision(50) << "X: " << x << " Y: " << y << " iter: " << iter << std::endl << std::endl;
-                break;
-            }
-            else
-            {
-                float cx = obj->crosshairMandelCoordX();
-                float cy = obj->crosshairMandelCoordY();
-
-                float zx = obj->crosshairCoordX();
-                float zy = obj->crosshairCoordY();
-
-                int iter;
-                float xtmp = 0.0f;
-                float lastx = 0.0f;
-                int n = 1;
-                int n2 = 3;
-                for (iter = 0; iter < 100; iter++)
-                {
-                    xtmp = zx * zx - zy * zy + cx;
-                    zy = 2.0f * zx * zy + cy;
-                    if (xtmp * xtmp + zy * zy > 4.0f)
-                        break;
-                    std::cout << std::setprecision(50) << "ZX: " << zx << " ZY: " << zy << " X==Xlast: " << (xtmp == lastx) << std::endl;
-                    if (xtmp == lastx)
-                    {
-                        //iter = ITER_MAX;//commenting out this line makes for some very interesting coloration
-                        break;
-                    }
-                    if (n2 % n == 0)
-                    {
-                        lastx = xtmp;
-                        n2 = 0;
-                        n++;
-                    }
-                    n2++;
-                    zx = xtmp;
-                }
-                std::cout << std::setprecision(50) << "ZX: " << zx << " ZY: " << zy << " iter: " << iter << 
-                    " n2: " << n2 << " n: " << n << std::endl << std::endl;
-            }
-        break;
         case GLFW_KEY_I: //Toggie GUI
             obj->m_showGui = !obj->m_showGui;
+            break;
+
+        case GLFW_KEY_T: //Show how long it took to render the frame. Disabled by default
+            obj->m_showRenderTime = !obj->m_showRenderTime;
+            obj->m_guiWindowPos.y += obj->m_showRenderTime ? -22.0f : 22.0f;
+            ImGui::SetWindowPos("Mandelbrot", obj->m_guiWindowPos);
             break;
 
         case GLFW_KEY_C: //Re-center the screen at the crosshair
@@ -545,6 +500,11 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
             obj->m_maxIter = obj->m_maxIterMax;
             obj->m_zoom = 1.0f;
             obj->m_Shaders[obj->m_currentShader].SetUniform1f("u_zoom", obj->m_zoom);
+            break;
+
+        case GLFW_KEY_ESCAPE: //Closes the window and exits the program
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+            ImGui::SetWindowPos("Mandelbrot", ImVec2(1655.0f, 1020.0f));
             break;
         }
     }

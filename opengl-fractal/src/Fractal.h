@@ -5,6 +5,10 @@
 #include "VertexBufferLayout.h"
 #include "FrameBuffer.h"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 //With a X/Y ratio of 5.0/2.8125 (16:9) the center of the screen is at
 //C coords (2.501302, 1.407552). We have to factor this into our equation for 
 //the zoom to scale properly
@@ -28,42 +32,48 @@ public:
 	~Fractal();
 
 	void MainRenderLoop();//Main logic loop - prepare to render on the GPU
+
 	void OnImGuiRender(); //GUI render logic
-	inline bool showGUI() const { return m_showGui; }
+
+	inline bool showGUI() const { return m_showGui; }//Press I to toggle
+
+	//True if m_maxIter >= m_maxIterMax and m_scaleFactor == 0
 	inline bool doneRendering() const { return m_doneRendering; }
+
 private:
-	GLFWwindow* m_window;
-	Shader m_Shaders[5];
+	GLFWwindow* m_window;  //The program's window object
+	Shader m_Shaders[5];   //Holds all our shader programs
 	int m_currentShader;   //Should be value 1 though 4, for indexes of m_Shaders. 
 						   //Index 0 is the crosshair shader, and is always drawn. 
-	Renderer m_Renderer;
+	Renderer m_Renderer;   //Send data to the GPU
 	VertexArray m_va;      //Vertex Array Objext -- links vertex buffer and its layout
 	VertexBuffer m_vb;     //Stores primitie vertex coordinates
 	VertexBufferLayout m_layout;//Specifies the number of bytes between entities 
 								//in the vertex buffer
 	IndexBuffer m_ib;      //List of indexes from the vertex buffer to render
 	FrameBuffer m_fb;      //Holds our textures of various scales
-	glm::vec3 m_scale;
-	glm::mat4 m_proj;
-	glm::vec2 m_crosshair;
-	glm::vec2 m_crosshairMandel;
-	glm::vec2 m_crosshairMandelStatic;
-	glm::vec2 m_offset;
-	glm::vec2 m_offsetMandel;
-	glm::vec2 m_offsetMandelStatic;
-	float m_zoom;
+	glm::mat4 m_proj;      //Projection matrix
+	glm::vec2 m_crosshair;            //This is the crosshair in view at all times, even in Julia mode
+	glm::vec2 m_crosshairMandel;      //Crosshair used to determine the point C for a Julia set
+	glm::vec2 m_crosshairMandelStatic;//Keeps track of original Mandel position to change back to with H key
+	glm::vec2 m_offset;				  //The C value at the center of the screen
+	glm::vec2 m_offsetMandel;	      //Used with crosshairMandel to get our C value in Julia set mode
+	glm::vec2 m_offsetMandelStatic;   //Keeps track of original C to change back to with H key
+	ImVec2 m_guiWindowPos;			  //Position of the ImGUI window on the screen
+	float m_zoom;		   //A smaller number means a smaller difference between points, which means we zoom in
 	float m_zoomMandel;    //The Mandel variables are for keeping track of the Mandelbrot state in Julia mode
 	float m_Exp;           //For caclulating our fractal -- n in z^n + c
 	float m_deltaExp;      //How much n changes by when we change it (.01, .05, 1)
-	bool m_showGui;
-	bool m_renderJulia;
+	bool m_showGui;        //Press the i key to toggle coordinate information on/off
+	bool m_showRenderTime; //Press T to toggle frame render time info (showGUI must be true)
+	bool m_renderJulia;    //Press J/H to enter Julia set mode from the Mandelbrot set
 	bool m_renderToTexture;//When false, we draw the crosshair over the pre-rendered texture
-	long long m_renderTime;
+	long long m_renderTime;//How long it took to render the most recent frame
 	int m_scaleFactor;     //For scaling window coordinates and dimensions to smaller textures
 	int m_maxIter;         //Increases by a factor of 2 up to maxIterMax every time we finish drawing a frame
-	int m_maxIterMax;
-	int m_windowWidth;
-	int m_windowHeight;
+	int m_maxIterMax;	   //The maximum iteration threashold; after wich (at scale 1) we are done rendering
+	int m_windowWidth;	   //X resolution of the screen in fullscreen
+	int m_windowHeight;	   //Y resolution of the screen in fullscreen
 	bool m_stop;           //Stop rendering if a key is pressed
 	bool m_imgChanged;     //If the keypress registered changed the image, scrap the image and start over
 	bool m_doneRendering;  //True if we have rendered all frames we need to, up to full res scale and maxIterMax
@@ -129,5 +139,6 @@ private:
 		m_maxIter = 100;
 	}
 
+	//Handle all key events for the program
 	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };

@@ -45,21 +45,24 @@ int main(void)
     //Set refresh rate (0 = unlimited)
     glfwSwapInterval(0);
 
+    //Initalize GLEW
     if (glewInit() != GLEW_OK)
         std::cout << "glewInit error!";
 
+    //Output OpenGL version to the console
     std::cout << glGetString(GL_VERSION) << std::endl;
     {
-        //GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-        //GLCall(glEnable(GL_BLEND));
-
+        //Set up ImGUI
         ImGui::CreateContext();
         ImGui_ImplGlfw_InitForOpenGL(window, true);
 
+        //Output GLSL version to the console
         char* str = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
         std::cout<<"Version: "<<str<<std::endl;
+
         //Tell ImGui which GLSL version to use
         ImGui_ImplOpenGL3_Init("#version 300 es");
+
         //Load custom font (Courier New Bold)
         ImGuiIO& io = ImGui::GetIO();
         ImFont* font = io.Fonts->AddFontFromFileTTF("res/fonts/courbd.ttf", 18.0f);
@@ -80,7 +83,7 @@ int main(void)
                     ImGui_ImplOpenGL3_NewFrame();
                     ImGui_ImplGlfw_NewFrame();
                     ImGui::NewFrame();
-
+                    
                     fractal.MainRenderLoop();
 
                     ImGui::Begin("Mandelbrot", 0, ImGuiWindowFlags_NoTitleBar
