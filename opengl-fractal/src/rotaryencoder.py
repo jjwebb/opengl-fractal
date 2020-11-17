@@ -120,7 +120,7 @@ def sw_callback(channel):
         if time0 - time1 > .1 and pressComplete:
             time1 = time0
             pressComplete = False
-            print("Set!")
+            #print("Set!")
 
 #Using encoders without capacitors results in a lot of bounce/noise, we keep track of
 #the last few states and filter this out in software 
@@ -134,10 +134,10 @@ def rotary_callback(channel):
     dt2State  = states[channel][1]
     if (clk2State == 0b0 or clk2State == 0b1 or clk2State == 0b1001 or clk2State == 0b1000) and dt2State == 0b11:
         device.emit_click(pairs[channel][2])
-        print(channel, " Backwards ", bin(clk2State), bin(dt2State))
+        #print(channel, " Backwards ", bin(clk2State), bin(dt2State))
     elif clk2State == 0b11 and (dt2State == 0b1 or dt2State == 0b0 or dt2State == 0b1001 or dt2State == 0b1000):
         device.emit_click(pairs[channel][3])
-        print(channel, " Forwards ", bin(clk2State), bin(dt2State))
+        #print(channel, " Forwards ", bin(clk2State), bin(dt2State))
 
 #Bind callbacks to the appropriate pins
 GPIO.add_event_detect(clk, GPIO.BOTH, callback=rotary_callback)
@@ -159,6 +159,8 @@ GPIO.add_event_detect(sw4, GPIO.BOTH, callback=sw_callback)
 GPIO.add_event_detect(clk5, GPIO.BOTH, callback=rotary_callback)
 GPIO.add_event_detect(dt5,  GPIO.BOTH, callback=rotary_callback)
 GPIO.add_event_detect(sw5,  GPIO.BOTH, callback=sw_callback)
+
+print("Rotary encoder script is running, press Ctrl-C to exit...")
 
 #Main loop
 try:
