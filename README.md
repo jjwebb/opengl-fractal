@@ -29,7 +29,7 @@ Fractal binary will be written to opengl-fractal/opengl-fractal
   `N` and `P` respectively raise and lower the exponent of the fractal function by an interval specified by `.` (+- .01, .05, .25, or 1.0)
 | `N`  | \- | `P` |
 | :-: | :-: | :-: |
-| z ↦ z^4.10 + c  | z ↦ z^2 + c (Mandelbrot) | z ↦ z^1.9 + c |
+| z ↦ z^4.10 + c  | z ↦ z^2 + c (Mandelbrot) | z ↦ z^1.90 + c |
 | <img src="screenshots/multibrot.png?raw=true" width="100%"> | <img src="screenshots/mandelbrot.png?raw=true" width="100%"> | <img src="screenshots/multibrot1.png?raw=true" width="100%"> |  
   
   `R` resets to 1x zoom and the origin (0 + 0i) on any set  
