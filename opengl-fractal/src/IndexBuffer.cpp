@@ -3,8 +3,8 @@
 
 IndexBuffer::IndexBuffer()
 {
-    m_RendererID = 0;
-    m_Count = 0;
+    m_RendererID = 0; //This is the ID of our buffer on the GPU
+    m_Count = 0; //Size of the buffer
 }
 
 IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int count)
@@ -27,6 +27,7 @@ void IndexBuffer::Unbind() const
     GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
+//Create index buffer on the GPU and send data to it
 void IndexBuffer::init(const unsigned int* data, unsigned int count)
 {
     m_Count = count;

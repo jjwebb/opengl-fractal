@@ -1,5 +1,6 @@
 #pragma once
 
+//Holds our primitive vertex screen coordinates to be rendered on the gpu
 class VertexBuffer
 {
 private: 
@@ -11,5 +12,5 @@ public:
 
 	void Bind() const;
 	void Unbind() const;
-	void init(const void* data, unsigned int size);
+	void init(const void* data, unsigned int size); //Send the buffer to the GPU
 };

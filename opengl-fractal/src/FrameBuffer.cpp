@@ -3,6 +3,7 @@
 FrameBuffer::FrameBuffer()
 {
 }
+
 FrameBuffer::FrameBuffer(GLFWwindow* window)
 	: m_window(window)
 {
@@ -37,6 +38,7 @@ FrameBuffer::~FrameBuffer()
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
+//Render to the texture of the specified scale
 void FrameBuffer::renderToTexture(int scaleFactor)
 {
 	if (scaleFactor > 3)
@@ -44,19 +46,13 @@ void FrameBuffer::renderToTexture(int scaleFactor)
 	else if (scaleFactor < 1)
 		scaleFactor = 1;
 	int width, height;
-	//glfwGetFramebufferSize(m_window, &width, &height);
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer[scaleFactor-1]));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture[scaleFactor-1]));
-	//GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture));
-	
-	//GLCall(glViewport(0, 0, width, height));
 }
 
+//Render to the visible framebuffer (the screen)
 void FrameBuffer::renderToScreen()
 {
 	int width, height;
-	//glfwGetFramebufferSize(m_window, &width, &height);
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-	//GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture));
-	//GLCall(glViewport(0, 0, width, height));
 }

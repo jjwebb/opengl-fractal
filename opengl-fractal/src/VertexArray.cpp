@@ -13,6 +13,7 @@ VertexArray::~VertexArray()
 	GLCall(glDeleteVertexArrays(1, &m_RendererID));
 }
 
+//Link a vertex buffer with its layout and send it to the GPU
 void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout)
 {
 	Bind();

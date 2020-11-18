@@ -13,8 +13,6 @@ if(UNIX)
 	pkg_search_module(GLFW REQUIRED glfw3)
 	include_directories(${GLFW_INCLUDE_DIRS})
 else()
-	#find_package(GLEW REQUIRED)
-	#find_package(glfw3 REQUIRED)
 	add_subdirectory(Dependencies/GLFW/glfw)
 	include_directories(Dependencies/GLFW/glfw/include)
 	include_directories(Dependencies/glew-2.1.0/include)
@@ -24,7 +22,5 @@ endif()
 find_package(OpenGL REQUIRED)
 
 find_package(glm REQUIRED PATHS ${PROJECT_SOURCE_DIR}/opengl-fractal/src/vendor/glm)
-
-#include_directories(${GLEW_INCLUDE_DIRS})
 
 add_subdirectory(opengl-fractal/src)

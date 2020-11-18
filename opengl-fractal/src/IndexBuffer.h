@@ -1,5 +1,6 @@
 #pragma once
 
+//Holds a list of vertex indices from the vertex buffer to be rendered
 class IndexBuffer
 {
 private: 
@@ -13,7 +14,7 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
-	void init(const unsigned int* data, unsigned int count);
+	void init(const unsigned int* data, unsigned int count); //Send buffer to the GPU
 
 	inline unsigned int GetCount() const { return m_Count; }
 };

@@ -84,6 +84,7 @@ Fractal::Fractal(GLFWwindow* window)
         m_Shaders[i].SetUniform2f("u_FramebufferSize", (float)m_windowWidth, (float)m_windowHeight);
         m_Shaders[i].SetUniform2f("u_offset", m_offset.x, m_offset.y);
         m_Shaders[i].SetUniform1f("u_zoom", m_zoom);
+        m_Shaders[i].SetUniform1i("ITER_MAX", m_maxIterMax);
     }
 }
 

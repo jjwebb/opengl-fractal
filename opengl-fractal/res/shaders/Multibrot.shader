@@ -41,6 +41,10 @@ void main()
 	cy += u_offset.y;
 
 	float x = 0.0f; float y = 0.0f; float xtmp = 0.0f;
+
+	/*The regular Mandelbrot and Julia set shaders are optimized for an exponent we
+	  know will be 2 -- when the exponent could be anything we don't have such luxury
+	  and have to do more complicated, slower math*/
 	for (iter = 0; iter < ITER_MAX; iter++)
 	{
 		xtmp = pow(x * x + y * y, (u_Exp / 2.0f)) * cos(u_Exp * atan(y, x)) + cx;

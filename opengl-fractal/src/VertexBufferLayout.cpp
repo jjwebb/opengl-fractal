@@ -3,7 +3,6 @@
 template<typename T>
 	void VertexBufferLayout::Push(unsigned int count)
 	{
-		//static_assert(false);
 		assert(false);
 	}
 

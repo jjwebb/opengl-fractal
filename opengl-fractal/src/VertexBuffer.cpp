@@ -26,6 +26,7 @@ void VertexBuffer::Unbind() const
     GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
+//Create a buffer on the GPU and send our vertex buffer to it
 void VertexBuffer::init(const void* data, unsigned int size)
 {
     GLCall(glGenBuffers(1, &m_RendererID));

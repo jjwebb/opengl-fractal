@@ -43,6 +43,9 @@ void main()
 
 	float xtmp = 0.0f;
 
+	/*The regular Mandelbrot and Julia set shaders are optimized for an exponent we
+	  know will be 2 -- when the exponent could be anything we don't have such luxury
+	  and have to do more complicated, slower math*/ 
 	for (iter = 0; iter < ITER_MAX; iter++)
 	{
 		xtmp = pow(zx * zx + zy * zy, (u_Exp / 2.0f)) * cos(u_Exp * atan(zy, zx)) + u_cVals.x;

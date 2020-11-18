@@ -1,17 +1,19 @@
 #pragma once
 
-//#include<GL/glew.h>
 #include <string>
 #include<unordered_map>
 
 #include "glm/glm.hpp"
 
+//Holds the shader souce code in a string
 struct ShaderProgramSource
 {
 	std::string VertexSource;
 	std::string FragmentSource;
 };
 
+/*Shader object representing one vertex/fragment shader pair.
+  Takes a string to a file which contains the source for both*/
 class Shader
 {
 private:
