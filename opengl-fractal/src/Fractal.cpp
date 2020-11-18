@@ -194,7 +194,7 @@ void Fractal::OnImGuiRender()
 
     ImGui::Text("Scale: %f (%ix)", m_zoom, (int)(1 / m_zoom));
     if(m_showRenderTime)
-        ImGui::Text("Render time: %lld", m_renderTime);
+        ImGui::Text("Render time: %.3f ms", m_renderTime / 1000.0f);
 }
 
 void Fractal::zoom(bool zoomIn)
