@@ -8,11 +8,11 @@ This repo contains precompiled binaries for Windows 10 and Raspberry Pi OS, whic
 
 ## Build:  
 #### Windows:  
-If you have some flavor of Microsoft Visual Studio 2019, go to ***File -> Open -> Cmake...*** and open the *CMakeLists.txt* in the root directory of the project. Right-click *CMakeLists.txt* in the **Solution Explorer** and choose ***Generate Cache for opengl-fractal***. Then select *fractal.exe* in the **Startup Item** dropdown and compile.  
+If you have some flavor of Microsoft Visual Studio 2019, go to ***File -> Open -> Cmake...*** and open the *CMakeLists.txt* in the root directory of the project. Choose *x64-Debug* or *x64-Release* in the **Configuration** dropdown and *fractal.exe* in the **Startup Item** dropdown and compile.  
 
 #### Raspberry Pi 4/Linux:
-Run the following commands in root directory:  
-`$ cmake .`  
+Run the following commands in the project root directory:  
+`$ cmake . -DCMAKE_BUILD_TYPE=`(`Release`/`Debug`)  
 `$ make fractal`  
   
 Fractal binary will be written to ***opengl-fractal/opengl-fractal***  
