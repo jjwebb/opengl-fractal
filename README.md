@@ -12,7 +12,7 @@ If you have some flavor of Microsoft Visual Studio 2019, go to ***File -> Open -
 
 #### Raspberry Pi 4/Linux:
 Run the following commands in the project root directory:  
-`$ cmake . -DCMAKE_BUILD_TYPE=`(`Release`/`Debug`)  
+`$ cmake . -DCMAKE_BUILD_TYPE=Release`/`Debug`  
 `$ make fractal`  
   
 Fractal binary will be written to ***opengl-fractal/opengl-fractal***  
