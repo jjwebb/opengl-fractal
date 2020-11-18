@@ -4,7 +4,12 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm)
 file(GLOB_RECURSE SRCS ./*.cpp)
 file(GLOB_RECURSE HDRS ./*.hpp)
 
-add_executable(fractal  ${SRCS} ${HDRS})
+#Add an icon to our Windows binary
+if(UNIX)
+	add_executable(fractal  ${SRCS} ${HDRS})
+else()
+	add_executable(fractal  ${SRCS} ${HDRS} icon.rc)
+endif()
 
 target_include_directories(fractal PRIVATE ${GLM_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm)
 
