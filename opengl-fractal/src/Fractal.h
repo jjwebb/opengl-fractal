@@ -9,13 +9,9 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-//With a X/Y ratio of 5.0/2.8125 (16:9) the center of the screen is at
-//C coords (2.501302, 1.407552). We have to factor this into our equation for 
-//the zoom to scale properly
-#define XMUL 5.0f
-#define YMUL 2.8125f
-#define XSUBT 2.501302f
-#define YSUBT 1.407552f
+#include "glm/gtc/matrix_transform.hpp"
+
+#define YRANGE 1.2f //Maximum i value displayed at program start
 
 #define GRIDRC 4 //Rendering grid # of rows and columns
 
@@ -59,7 +55,7 @@ private:
 	glm::vec2 m_offset;				  //The C value at the center of the screen
 	glm::vec2 m_offsetMandel;	      //Used with crosshairMandel to get our C value in Julia set mode
 	glm::vec2 m_offsetMandelStatic;   //Keeps track of original C to change back to with H key
-	ImVec2 m_guiWindowPos;			  //Position of the ImGUI window on the screen
+	ImVec2 m_guiOffset;		       	  //Pixel offset from lower right hand corner of screen for GUI window
 	float m_zoom;		   //A smaller number means a smaller difference between points, which means we zoom in
 	float m_zoomMandel;    //The Mandel variables are for keeping track of the Mandelbrot state in Julia mode
 	float m_Exp;           //For caclulating our fractal -- n in z^n + c
@@ -74,6 +70,10 @@ private:
 	int m_maxIterMax;	   //The maximum iteration threashold; after wich (at scale 1) we are done rendering
 	int m_windowWidth;	   //X resolution of the screen in fullscreen
 	int m_windowHeight;	   //Y resolution of the screen in fullscreen
+	float m_aspectRatio;   //X resolution / Y resolution
+	bool m_fullscreen;	   //Whether to display the program in fullscreen
+	int  m_refreshRate;	   //Screen refresh rate -- lowering this will cause the image to change more slowly
+	bool m_showCrosshair;   //Whether to display the crosshair on the screen
 	bool m_stop;           //Stop rendering if a key is pressed
 	bool m_imgChanged;     //If the keypress registered changed the image, scrap the image and start over
 	bool m_doneRendering;  //True if we have rendered all frames we need to, up to full res scale and maxIterMax
@@ -88,15 +88,59 @@ private:
 	//Zoom in or out
 	void zoom(bool zoomIn);
 
-	//These functions return the Z or C coordinate pointed to by the crosshair rather than raw screen coords
-	inline float crosshairCoordX() const {
-		return ((m_crosshair.x / m_windowWidth ) * XMUL - XSUBT) * m_zoom + m_offset.x; }
-	inline float crosshairCoordY() const {
-		return ((m_crosshair.y / m_windowHeight) * YMUL - YSUBT) * m_zoom + m_offset.y; }
-	inline float crosshairMandelCoordX() const {
-		return ((m_crosshairMandel.x / m_windowWidth) * XMUL - XSUBT) * m_zoomMandel + m_offsetMandel.x; }
-	inline float crosshairMandelCoordY() const {
-		return ((m_crosshairMandel.y / m_windowHeight) * YMUL - YSUBT) * m_zoomMandel + m_offsetMandel.y; }
+	//Returns the Z (if Julia) or C coordinates pointed to by the crosshair rather than raw screen coords
+	inline glm::vec2 crosshairCoords() const {
+		glm::mat4 proj2 = glm::ortho(0.0f, float(m_windowWidth), 0.0f, float(m_windowHeight), -1.0f, 1.0f);
+
+		//Normalize crosshair coords to range of (-1.0, 1.0), (-1.0, 1.0)
+		glm::vec4 translation = (proj2 * glm::vec4((m_crosshair.x - 0.5f), (m_crosshair.y - 0.5f), -1.0f, 1.0f));
+		
+		//X coord = normalized (-1.0, 1.0) x value * max Y val * aspect ratio * zoom + offset
+		return glm::vec2(translation.x * YRANGE * (float(m_windowWidth) / m_windowHeight) * m_zoom + m_offset.x,
+						 translation.y * YRANGE * m_zoom + m_offset.y);
+	}
+
+	inline glm::vec2 crosshairMandelCoords() const {
+		glm::mat4 proj2 = glm::ortho(0.0f, float(m_windowWidth), 0.0f, float(m_windowHeight), -1.0f, 1.0f);
+
+		//Normalize crosshair coords to range of (-1.0, 1.0), (-1.0, 1.0)
+		glm::vec4 translation = (proj2 * glm::vec4((m_crosshairMandel.x - 0.5f), (m_crosshairMandel.y - 0.5f), -1.0f, 1.0f));
+
+		//X coord = normalized (-1.0, 1.0) x value * max Y val * aspect ratio * zoom + offset
+		return glm::vec2(translation.x * YRANGE * (float(m_windowWidth) / m_windowHeight) * m_zoomMandel + m_offsetMandel.x,
+						 translation.y * YRANGE * m_zoomMandel + m_offsetMandel.y);
+	}
+
+	//Toggles whether or not the crosshair will be displayed
+	inline void toggleCrosshair() {
+		m_showCrosshair = !m_showCrosshair;
+		m_Shaders[0].SetUniform1i("u_showCrosshair", m_showCrosshair);
+	}
+
+	inline void checkCrosshair() {
+		if (m_zoom != m_zoomMandel)
+			m_showCrosshair = false;
+		else
+			m_showCrosshair = true;
+	}
+
+	/*Returns an amount for the crosshair to move relative to the difference between 
+	  the zoom level on the Mandelbrot set and the zoom level of the Julia set displayed*/
+	inline int crosshairZoomDiff() { 
+		//int diff = int( 20 * (1.0f - (m_zoom - m_zoomMandel)) ); 
+		int diff = int(20 * (m_zoomMandel / m_zoom));
+		if (diff == 0)
+		{
+			if (m_showCrosshair)
+				toggleCrosshair();
+		}
+		else
+		{
+			if (!m_showCrosshair)
+				toggleCrosshair();
+		}
+		return diff;
+	}
 
 	//Resets the crosshair in view
 	inline void resetCrosshair() {
@@ -112,9 +156,18 @@ private:
 
 	//Sets offset to crosshair position
 	inline void setOffset() {
-		m_offset.x = crosshairCoordX();
-		m_offset.y = crosshairCoordY();
+		glm::vec2 coords = crosshairCoords();
+		m_offset.x = coords.x;
+		m_offset.y = coords.y;
 		m_Shaders[m_currentShader].SetUniform2f("u_offset", m_offset.x, m_offset.y);
+	}
+
+	/*Sets Mandel offset to crosshairMandel position. We don't send this to the GPU because
+	  "offset" always represents the offset seen on the screen*/
+	inline void setOffsetMandel() {
+		glm::vec2 coords = crosshairMandelCoords();
+		m_offsetMandel.x = coords.x;
+		m_offsetMandel.y = coords.y;
 	}
 
 	//Sets offset to 0
@@ -124,11 +177,17 @@ private:
 		m_Shaders[m_currentShader].SetUniform2f("u_offset", m_offset.x, m_offset.y);
 	}
 
+	//Set the projection matrix to account for the current zoom level
+	inline void setProjectionMatrix() {
+		float xMax = m_aspectRatio * YRANGE;
+		m_proj = glm::ortho(-xMax * m_zoom, xMax * m_zoom, -YRANGE * m_zoom, YRANGE * m_zoom, -1.0f, 1.0f);
+		m_Shaders[m_currentShader].SetUniformMat4f("u_MVP", m_proj);
+	}
+
 	//Change the Julia set displayed if C changes
 	inline void changeJulia() {
-		float cx = crosshairMandelCoordX();
-		float cy = crosshairMandelCoordY();
-		m_Shaders[m_currentShader].SetUniform2f("u_cVals", cx, cy);
+		glm::vec2 C = crosshairMandelCoords();
+		m_Shaders[m_currentShader].SetUniform2f("u_cVals", C.x, C.y);
 		resetRenderQuality();
 	}
 
@@ -139,6 +198,14 @@ private:
 		m_maxIter = 100;
 	}
 
+	//Set the position of the ImGUI window
+	inline void setGUIpos() { 
+		ImGui::SetWindowPos("Mandelbrot", ImVec2(m_windowWidth - m_guiOffset.x, m_windowHeight - m_guiOffset.y)); 
+	}
+
 	//Handle all key events for the program
 	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+	//Handle window resize events
+	static void window_size_callback(GLFWwindow* window, int width, int height);
 };

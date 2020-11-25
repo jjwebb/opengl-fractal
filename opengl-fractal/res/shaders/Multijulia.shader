@@ -6,10 +6,14 @@ precision highp float;
 in vec4 position;
 
 uniform mat4 u_MVP;
+uniform vec2 u_offset;
+
+out vec2 v_Z;
 
 void main()
 {
 	gl_Position = u_MVP * position;
+	v_Z = position.xy + u_offset;
 };
 
 #shader fragment
@@ -17,29 +21,21 @@ void main()
 
 precision highp float;
 
-#define XMUL 5.0f
-#define YMUL 2.8125f
-#define XSUBT 2.501302f
-#define YSUBT 1.407552f
+in vec2 v_Z;
 
 out vec4 color;
 
-uniform vec2 u_FramebufferSize;
-uniform vec2 u_offset;
 uniform vec2 u_cVals;
 uniform int ITER_MAX;
-uniform float u_zoom;
 uniform float u_Exp;
 
 void main()
 {
 
 	int iter;
-	float zx = ((gl_FragCoord.x / u_FramebufferSize.x) * XMUL - XSUBT) * u_zoom;
-	float zy = ((gl_FragCoord.y / u_FramebufferSize.y) * YMUL - YSUBT) * u_zoom;
-
-	zx += u_offset.x;
-	zy += u_offset.y;
+	
+	float zx = v_Z.x;
+	float zy = v_Z.y;
 
 	float xtmp = 0.0f;
 

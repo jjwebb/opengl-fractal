@@ -28,8 +28,7 @@ Renderer::~Renderer()
 
 void Renderer::Clear() const
 {
-    //GLCall(glClear(GL_COLOR_BUFFER_BIT));
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 }
 
 void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
@@ -38,7 +37,7 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
     int quads = ib.GetCount() / 6;
     shader.Bind();
     va.Bind();
-    ib.Bind(); //va does this already (does it????)
+    ib.Bind();
     for (int i = 0; i < quads; i++)
     {
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(i * 6 * sizeof(unsigned int))));
@@ -51,7 +50,7 @@ const bool& stop, const int& scale, const int& maxIter, const bool& changed) con
     int quads = ib.GetCount() / 6;
     shader.Bind();
     va.Bind();
-    ib.Bind(); //va does this already (does it????)
+    ib.Bind();
     if (scale != m_scaleLast || maxIter != m_maxIterLast)
     {
         Clear();

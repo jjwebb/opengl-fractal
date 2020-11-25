@@ -23,7 +23,8 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
     //Create a fullscreen window
-    window = glfwCreateWindow(1920, 1080, "Mandelbrot", glfwGetPrimaryMonitor(), NULL);
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    window = glfwCreateWindow(mode->width, mode->height, "Fractal Explorer", glfwGetPrimaryMonitor(), NULL);
     const char * err;
     int code = glfwGetError(&err);
     if (err != GLFW_NO_ERROR || !window)
@@ -35,9 +36,6 @@ int main(void)
 
     //Lock aspect ratio to 16:9
     glfwSetWindowAspectRatio(window, 16, 9);
-
-    //Disable the cursor
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     //Make the window's context current
     glfwMakeContextCurrent(window);
