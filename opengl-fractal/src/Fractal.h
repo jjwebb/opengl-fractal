@@ -48,7 +48,8 @@ private:
 								//in the vertex buffer
 	IndexBuffer m_ib;      //List of indexes from the vertex buffer to render
 	FrameBuffer m_fb;      //Holds our textures of various scales
-	glm::mat4 m_proj;      //Projection matrix
+	glm::mat4 m_proj;      //Projection matrix -- normalize Mandelbrot coordinates to (-1, 1)
+	glm::mat4 m_projCrosshair;	      //Matrix to normalize crosshair coords to (-1, 1)
 	glm::vec2 m_crosshair;            //This is the crosshair in view at all times, even in Julia mode
 	glm::vec2 m_crosshairMandel;      //Crosshair used to determine the point C for a Julia set
 	glm::vec2 m_crosshairMandelStatic;//Keeps track of original Mandel position to change back to with H key
@@ -90,21 +91,18 @@ private:
 
 	//Returns the Z (if Julia) or C coordinates pointed to by the crosshair rather than raw screen coords
 	inline glm::vec2 crosshairCoords() const {
-		glm::mat4 proj2 = glm::ortho(0.0f, float(m_windowWidth), 0.0f, float(m_windowHeight), -1.0f, 1.0f);
-
 		//Normalize crosshair coords to range of (-1.0, 1.0), (-1.0, 1.0)
-		glm::vec4 translation = (proj2 * glm::vec4((m_crosshair.x - 0.5f), (m_crosshair.y - 0.5f), -1.0f, 1.0f));
+		glm::vec4 translation = (m_projCrosshair * glm::vec4((m_crosshair.x - 0.5f), (m_crosshair.y - 0.5f), -1.0f, 1.0f));
 		
 		//X coord = normalized (-1.0, 1.0) x value * max Y val * aspect ratio * zoom + offset
 		return glm::vec2(translation.x * YRANGE * (float(m_windowWidth) / m_windowHeight) * m_zoom + m_offset.x,
 						 translation.y * YRANGE * m_zoom + m_offset.y);
 	}
 
+	//Returns the C coordinate pointed to by the crosshair on the Mandelbrot set when in Julia mode
 	inline glm::vec2 crosshairMandelCoords() const {
-		glm::mat4 proj2 = glm::ortho(0.0f, float(m_windowWidth), 0.0f, float(m_windowHeight), -1.0f, 1.0f);
-
 		//Normalize crosshair coords to range of (-1.0, 1.0), (-1.0, 1.0)
-		glm::vec4 translation = (proj2 * glm::vec4((m_crosshairMandel.x - 0.5f), (m_crosshairMandel.y - 0.5f), -1.0f, 1.0f));
+		glm::vec4 translation = (m_projCrosshair * glm::vec4((m_crosshairMandel.x - 0.5f), (m_crosshairMandel.y - 0.5f), -1.0f, 1.0f));
 
 		//X coord = normalized (-1.0, 1.0) x value * max Y val * aspect ratio * zoom + offset
 		return glm::vec2(translation.x * YRANGE * (float(m_windowWidth) / m_windowHeight) * m_zoomMandel + m_offsetMandel.x,
@@ -127,7 +125,6 @@ private:
 	/*Returns an amount for the crosshair to move relative to the difference between 
 	  the zoom level on the Mandelbrot set and the zoom level of the Julia set displayed*/
 	inline int crosshairZoomDiff() { 
-		//int diff = int( 20 * (1.0f - (m_zoom - m_zoomMandel)) ); 
 		int diff = int(20 * (m_zoomMandel / m_zoom));
 		if (diff == 0)
 		{
@@ -195,7 +192,13 @@ private:
 	inline void resetRenderQuality() {
 		m_imgChanged = true;
 		m_scaleFactor = 3;
-		m_maxIter = 100;
+		if (m_renderTime > 30000)
+			m_maxIter = m_maxIterMax / 4;
+		else if (m_renderTime > 20000)
+			m_maxIter = m_maxIterMax / 2;
+		else
+			m_maxIter = m_maxIterMax;
+		std::cout << m_renderTime << " " << m_maxIter << std::endl;
 	}
 
 	//Set the position of the ImGUI window

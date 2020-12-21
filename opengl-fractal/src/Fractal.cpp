@@ -20,6 +20,7 @@ Fractal::Fractal(GLFWwindow* window)
     m_ib(),
     m_fb(window),
     m_proj(0),
+    m_projCrosshair(0),
     m_crosshair(0.0f, 0.0f),
     m_crosshairMandel(0.0f, 0.0f),
     m_crosshairMandelStatic(0.0f, 0.0f),
@@ -86,8 +87,9 @@ Fractal::Fractal(GLFWwindow* window)
     //Set crosshair to the center of the screen
     resetCrosshair();
 
-    //Set projection matrix for coordinate interpolation
+    //Set projection matrices for coordinate interpolation
     m_proj = glm::ortho(-YRANGE * m_aspectRatio, YRANGE * m_aspectRatio, -YRANGE, YRANGE, -1.0f, 1.0f);
+    m_projCrosshair = glm::ortho(0.0f, float(m_windowWidth), 0.0f, float(m_windowHeight), -1.0f, 1.0f);
 
     //Send variables to the GPU (must be done for each shader program)
     m_Shaders[0].SetUniformMat4f("u_MVP", m_proj);
@@ -122,13 +124,12 @@ void Fractal::MainRenderLoop()
         flicker as the lower-threshold (and thus darker as it includes more points) image is shown for 
         only a fraction of a second. The Pi is slow enough that rendering at a lower threshold is
         necessary to make the program fluid enough to feel usable.*/
-        #if defined(WIN32) or defined(_WIN32)
-        m_maxIter = m_maxIterMax;
-        #endif
+        //#if defined(WIN32) or defined(_WIN32)
+        //m_maxIter = m_maxIterMax;
+        //#endif
 
         m_Shaders[m_currentShader].SetUniform1i("ITER_MAX", m_maxIter);
 
-        //Due to above preprocessor command, we'll render at twice the threshold of a Pi on a PC
         m_maxIter *= 2;
 
         if (m_scaleFactor == 1)//ONLY render at full scale resolution once we've reached the specified threshold
@@ -248,7 +249,6 @@ void Fractal::window_size_callback(GLFWwindow* window, int width, int height)
 
         double widthRatio  = double(width)  / double(obj->m_windowWidth);
         double heightRatio = double(height) / double(obj->m_windowHeight);
-        std::cout << "Width: " << width << " height: " << height << " ratios: " << widthRatio << " " << heightRatio << std::endl;
         obj->m_crosshairMandel = 
             glm::vec2(obj->m_crosshairMandel.x * widthRatio, 
                       obj->m_crosshairMandel.y * heightRatio);
@@ -259,6 +259,7 @@ void Fractal::window_size_callback(GLFWwindow* window, int width, int height)
         obj->m_windowHeight = height;
         obj->m_aspectRatio = float(width) / float(height);
         obj->m_fb.resizeTextures(width, height);
+        obj->m_projCrosshair = glm::ortho(0.0f, float(obj->m_windowWidth), 0.0f, float(obj->m_windowHeight), -1.0f, 1.0f);
         
         obj->m_stop = true;
         obj->m_doneRendering = false;
@@ -382,10 +383,6 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
         case GLFW_KEY_LEFT:
             if (key == GLFW_KEY_A && obj->m_renderJulia)
             {
-                std::cout << obj->m_zoom << " " << obj->m_zoomMandel 
-                    << " " <<obj->m_zoomMandel / obj->m_zoom << " "
-                    //<< 20 * (1.0f - (obj->m_zoom - obj->m_zoomMandel)) << " "
-                    << int(20 * (obj->m_zoomMandel / obj->m_zoom)) << std::endl;
                 obj->m_crosshair.x -= obj->crosshairZoomDiff();
                 obj->m_crosshairMandel.x -= 20;
                 obj->changeJulia();
