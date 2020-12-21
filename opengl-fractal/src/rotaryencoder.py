@@ -11,7 +11,7 @@ sw = 7
 
 clk2 = 14
 dt2 = 15
-sw2 = 18
+sw2 = 23
 
 clk3 = 17
 dt3 = 27
@@ -21,9 +21,9 @@ clk4 = 10
 dt4 = 9
 sw4 = 25
 
-clk5 = 2
-dt5  = 3
-sw5  = 4
+clk5 = 5
+dt5  = 6
+sw5  = 13
 
 #Set up GPIO pins. Set internal pullup for encoders with no external resistor
 GPIO.setmode(GPIO.BCM)
@@ -41,9 +41,9 @@ GPIO.setup(clk4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(dt4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(sw4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-GPIO.setup(clk5, GPIO.IN)
-GPIO.setup(dt5, GPIO.IN)
-GPIO.setup(sw5, GPIO.IN)
+GPIO.setup(clk5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(dt5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(sw5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 #Pair pins with their respective keys
 pairs = {sw   : (uinput.KEY_H, uinput.KEY_J),
