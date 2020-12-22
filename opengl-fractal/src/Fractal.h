@@ -37,18 +37,17 @@ public:
 	inline bool doneRendering() const { return m_doneRendering; }
 
 private:
-	GLFWwindow* m_window;  //The program's window object
-	Shader m_Shaders[5];   //Holds all our shader programs
-	int m_currentShader;   //Should be value 1 though 4, for indexes of m_Shaders. 
-						   //Index 0 is the crosshair shader, and is always drawn. 
-	Renderer m_Renderer;   //Send data to the GPU
-	VertexArray m_va;      //Vertex Array Objext -- links vertex buffer and its layout
-	VertexBuffer m_vb;     //Stores primitie vertex coordinates
-	VertexBufferLayout m_layout;//Specifies the number of bytes between entities 
-								//in the vertex buffer
-	IndexBuffer m_ib;      //List of indexes from the vertex buffer to render
-	FrameBuffer m_fb;      //Holds our textures of various scales
-	glm::mat4 m_proj;      //Projection matrix -- normalize Mandelbrot coordinates to (-1, 1)
+	GLFWwindow* m_window;		//The program's window object
+	Shader m_Shaders[5];		//Holds all our shader programs
+	int m_currentShader;		//Should be value 1 though 4, for indexes of m_Shaders. 
+								//Index 0 is the crosshair shader, and is always drawn. 
+	Renderer m_Renderer;		//Send data to the GPU
+	VertexArray m_va;			//Vertex Array Objext -- links vertex buffer and its layout
+	VertexBuffer m_vb;			//Stores primitie vertex coordinates
+	VertexBufferLayout m_layout;//Specifies the number of bytes between entities in the vertex buffer
+	IndexBuffer m_ib;			//List of indexes from the vertex buffer to render
+	FrameBuffer m_fb;			//Holds our textures of various scales
+	glm::mat4 m_proj;				  //Projection matrix -- normalize Mandelbrot coordinates to (-1, 1)
 	glm::mat4 m_projCrosshair;	      //Matrix to normalize crosshair coords to (-1, 1)
 	glm::vec2 m_crosshair;            //This is the crosshair in view at all times, even in Julia mode
 	glm::vec2 m_crosshairMandel;      //Crosshair used to determine the point C for a Julia set
@@ -74,7 +73,7 @@ private:
 	float m_aspectRatio;   //X resolution / Y resolution
 	bool m_fullscreen;	   //Whether to display the program in fullscreen
 	int  m_refreshRate;	   //Screen refresh rate -- lowering this will cause the image to change more slowly
-	bool m_showCrosshair;   //Whether to display the crosshair on the screen
+	bool m_showCrosshair;  //Whether to display the crosshair on the screen
 	bool m_stop;           //Stop rendering if a key is pressed
 	bool m_imgChanged;     //If the keypress registered changed the image, scrap the image and start over
 	bool m_doneRendering;  //True if we have rendered all frames we need to, up to full res scale and maxIterMax
@@ -191,14 +190,16 @@ private:
 	//Reset render quality to minimum value
 	inline void resetRenderQuality() {
 		m_imgChanged = true;
+		if(m_scaleFactor == 2)
+		{
+			if (m_renderTime > 30000)
+				m_maxIter = m_maxIterMax / 4;
+			else if (m_renderTime > 20000)
+				m_maxIter = m_maxIterMax / 2;
+			else
+				m_maxIter = m_maxIterMax;
+		}
 		m_scaleFactor = 3;
-		if (m_renderTime > 30000)
-			m_maxIter = m_maxIterMax / 4;
-		else if (m_renderTime > 20000)
-			m_maxIter = m_maxIterMax / 2;
-		else
-			m_maxIter = m_maxIterMax;
-		std::cout << m_renderTime << " " << m_maxIter << std::endl;
 	}
 
 	//Set the position of the ImGUI window

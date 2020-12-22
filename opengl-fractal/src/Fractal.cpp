@@ -27,7 +27,7 @@ Fractal::Fractal(GLFWwindow* window)
     m_offset(0.0f, 0.0f),
     m_offsetMandel(0.0f, 0.0f),
     m_offsetMandelStatic(0.0f, 0.0f),
-    m_guiOffset(265.0f, 60.0f),
+    m_guiOffset(265.0f, 80.0f),
     m_zoom(1.0f),
     m_zoomMandel(0.0f),
     m_Exp(2.0f),
