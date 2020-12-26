@@ -578,7 +578,7 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 obj->m_deltaExp = 0.01f;
             break;
 
-        case GLFW_KEY_O:
+        case GLFW_KEY_O: //Toggle between different maximum iteration values
             if (obj->m_maxIterMax == 100)
                 obj->m_maxIterMax = 200;
             else if (obj->m_maxIterMax == 200)
