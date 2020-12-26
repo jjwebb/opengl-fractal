@@ -47,7 +47,7 @@ GPIO.setup(sw5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 #Pair pins with their respective keys
 pairs = {sw   : (uinput.KEY_H, uinput.KEY_J),
-         sw2  : (uinput.KEY_I, uinput.KEY_C),
+         sw2  : (uinput.KEY_O, uinput.KEY_C),
          sw3  : (uinput.KEY_BACKSPACE, uinput.KEY_BACKSPACE),
          sw4  : (uinput.KEY_ENTER, uinput.KEY_ENTER),
          sw5  : (uinput.KEY_R, uinput.KEY_DOT, uinput.KEY_T),
@@ -65,7 +65,7 @@ pairs = {sw   : (uinput.KEY_H, uinput.KEY_J),
 
 #We need to tell uinput which keys we want to use
 keys = [uinput.KEY_A, uinput.KEY_D, uinput.KEY_W, uinput.KEY_S,
-        uinput.KEY_J, uinput.KEY_H, uinput.KEY_I, uinput.KEY_C,
+        uinput.KEY_J, uinput.KEY_H, uinput.KEY_O, uinput.KEY_C,
         uinput.KEY_ENTER, uinput.KEY_BACKSPACE, uinput.KEY_T,
         uinput.KEY_UP, uinput.KEY_DOWN, uinput.KEY_LEFT, uinput.KEY_RIGHT,
         uinput.KEY_P, uinput.KEY_N, uinput.KEY_R, uinput.KEY_DOT]
