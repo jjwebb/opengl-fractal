@@ -578,6 +578,18 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                 obj->m_deltaExp = 0.01f;
             break;
 
+        case GLFW_KEY_O:
+            if (obj->m_maxIterMax == 400)
+                obj->m_maxIterMax = 200;
+            else if (obj->m_maxIterMax == 200)
+                obj->m_maxIterMax = 100;
+            else if (obj->m_maxIterMax == 100)
+                obj->m_maxIterMax = 400;
+
+            obj->m_scaleFactor = 2;
+            obj->resetRenderQuality();
+            break;
+
         case GLFW_KEY_I: //Toggie GUI
             obj->m_showGui = !obj->m_showGui;
             break;

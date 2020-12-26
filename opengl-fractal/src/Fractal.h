@@ -199,8 +199,8 @@ private:
 			else
 				m_maxIter = m_maxIterMax;
 		}
-    else if(m_scaleFactor == 3)
-      m_maxIter = m_maxIterMax / 4;
+		else if(m_scaleFactor == 3)
+		  m_maxIter = m_maxIterMax / 4;
 		m_scaleFactor = 3;
 	}
 
