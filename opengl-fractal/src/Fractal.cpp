@@ -39,7 +39,7 @@ Fractal::Fractal(GLFWwindow* window)
     m_renderTime(0),
     m_scaleFactor(1),
     m_maxIter(200),
-    m_maxIterMax(400),
+    m_maxIterMax(200),
     m_windowWidth(0),
     m_windowHeight(0),
     m_aspectRatio(0),
@@ -579,15 +579,16 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
             break;
 
         case GLFW_KEY_O:
-            if (obj->m_maxIterMax == 400)
+            if (obj->m_maxIterMax == 100)
                 obj->m_maxIterMax = 200;
             else if (obj->m_maxIterMax == 200)
-                obj->m_maxIterMax = 100;
-            else if (obj->m_maxIterMax == 100)
                 obj->m_maxIterMax = 400;
+            else if (obj->m_maxIterMax == 400)
+                obj->m_maxIterMax = 100;
 
             obj->m_scaleFactor = 2;
-            obj->resetRenderQuality();
+            obj->m_maxIter = obj->m_maxIterMax;
+            obj->m_imgChanged = true;
             break;
 
         case GLFW_KEY_I: //Toggie GUI
