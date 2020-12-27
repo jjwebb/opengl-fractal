@@ -496,7 +496,6 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                     obj->m_offset.y = obj->m_offsetMandelStatic.y;
                     obj->m_crosshair.x = obj->m_crosshairMandelStatic.x;
                     obj->m_crosshair.y = obj->m_crosshairMandelStatic.y;
-                    obj->m_zoom = obj->m_zoomMandel;
                 }
                 else
                 {
@@ -507,6 +506,8 @@ void Fractal::key_callback(GLFWwindow* window, int key, int scancode, int action
                     obj->m_crosshair.x = obj->m_crosshairMandel.x;
                     obj->m_crosshair.y = obj->m_crosshairMandel.y;
                 }
+
+                obj->m_zoom = obj->m_zoomMandel;
 
                 if (!obj->m_showCrosshair)
                     obj->toggleCrosshair();
