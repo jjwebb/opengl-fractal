@@ -1,0 +1,20 @@
+[Unit]
+Description=Fractal service
+#After=graphical.target
+
+[Service]
+#Type=forking
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+Restart=always
+RestartSec=10s
+WorkingDirectory=/home/pi/opengl-fractal/opengl-fractal
+ExecStart=xinit /home/pi/opengl-fractal/opengl-fractal/fractal -nocursor
+#User=pi
+#Group=pi
+KillMode=process
+TimeoutSec=infinity
+
+[Install]
+WantedBy=multi-user.target
+#WantedBy=graphical.target
