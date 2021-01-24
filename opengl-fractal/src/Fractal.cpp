@@ -39,7 +39,7 @@ Fractal::Fractal(GLFWwindow* window)
     m_renderTime(0),
     m_scaleFactor(1),
     m_maxIter(200),
-    m_maxIterMax(200),
+    m_maxIterMax(400),
     m_windowWidth(0),
     m_windowHeight(0),
     m_aspectRatio(0),
