@@ -119,15 +119,6 @@ void Fractal::MainRenderLoop()
     //Double the maximum iterations of the fractal equation every render until the specified threshold
     if (m_maxIter <= m_maxIterMax)
     {
-        /*Quick and dirty hack for windows PCs -- most PCs are so fast that the speed improvement from
-        rendering at a lower iteration threshold first will be negligable and will cause the screen to 
-        flicker as the lower-threshold (and thus darker as it includes more points) image is shown for 
-        only a fraction of a second. The Pi is slow enough that rendering at a lower threshold is
-        necessary to make the program fluid enough to feel usable.*/
-        //#if defined(WIN32) or defined(_WIN32)
-        //m_maxIter = m_maxIterMax;
-        //#endif
-
         m_Shaders[m_currentShader].SetUniform1i("ITER_MAX", m_maxIter);
 
         m_maxIter *= 2;

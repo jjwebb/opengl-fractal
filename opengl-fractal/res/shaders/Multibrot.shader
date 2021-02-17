@@ -42,9 +42,6 @@ void main()
 	  and have to do more complicated, slower math*/
 	for (iter = 0; iter < ITER_MAX; iter++)
 	{
-		//y2 = y * y;
-		//xy = x * x + y2;
-
 		xtmp = pow(x * x + y * y, (u_Exp / 2.0f)) * cos(u_Exp * atan(y, x)) + cx;
 		y = pow(x * x + y * y, (u_Exp / 2.0f)) * sin(u_Exp * atan(y, x)) + cy;
 		if (xtmp * xtmp + y * y > 4.0f)
