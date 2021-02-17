@@ -41,8 +41,10 @@ Fractal binary will be written to ***opengl-fractal/opengl-fractal***
   
   `R` resets to 1x zoom and the origin (0 + 0i) on any set  
   `C` centers the screen at the crosshair  
+  `O` toggles through different maximum iterations (100, 200, or 400 -- default 400)  
   `I` toggles the text info on/off  
   `T` toggles displaying the render time for the last frame (for diagnostics)  
+  `Alt` + `Space` toggles between windowed and fullscreen mode  
   `Esc` exits the program  
     
   There's lots to explore, have fun!
