@@ -39,7 +39,7 @@ void main()
 	
 	/*This simple for loop is responsible for all the beauty in the mandelbrot set!
 	We iterate up to the maximum number of times specified -- if |x + y| is ever > 2, 
-	The point is unstable and will go to infinty. If if remains bounded (<=2), it is
+	The point is unstable and will go to infinty. If it remains bounded (<=2), it is
 	in the set (or so we assume) and we color the pixel black. A higher max iteration
 	excludes more points as points closer to the edge take longer and longer to escape*/
 	for (iter = 0; iter < ITER_MAX; iter++)
